@@ -3,7 +3,6 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Download, Monitor, Apple } from 'lucide-vue-next'
 import { useLatestRelease } from '../composables/useLatestRelease'
-import { RELEASES_URL } from '../config'
 
 const { t } = useI18n()
 const { release, loading } = useLatestRelease()
@@ -11,10 +10,10 @@ const { release, loading } = useLatestRelease()
 const cards = computed(() => {
   const r = release.value
   return [
-    { icon: Monitor, name: t('download.windows'), req: t('download.windowsReq'), links: [{ label: 'x64 .exe', url: r?.windows?.browser_download_url }] },
+    { icon: Monitor, name: t('download.windows'), req: t('download.windowsReq'), links: [{ label: 'x64 .exe', url: r?.windows?.url }] },
     { icon: Apple, name: t('download.mac'), req: t('download.macReq'), links: [
-      { label: 'Apple Silicon .dmg', url: r?.macArm?.browser_download_url },
-      { label: 'Intel .dmg', url: r?.macIntel?.browser_download_url },
+      { label: 'Apple Silicon .dmg', url: r?.macArm?.url },
+      { label: 'Intel .dmg', url: r?.macIntel?.url },
     ] },
   ]
 })
@@ -41,6 +40,5 @@ const cards = computed(() => {
     </div>
     <p v-if="!loading && !release?.windows && !release?.macArm" class="mt-6 text-sm text-muted">{{ t('download.noRelease') }}</p>
     <p class="mx-auto mt-6 max-w-xl text-xs text-muted/70">{{ t('download.unsigned') }}</p>
-    <a :href="RELEASES_URL" target="_blank" rel="noopener" class="mt-4 inline-block text-sm text-accent hover:underline">{{ t('download.viewReleases') }} →</a>
   </section>
 </template>

@@ -1,4 +1,6 @@
 export const REPO = { owner: '7sadakonr', name: 'Arctri' }
 export const REPO_URL = `https://github.com/${REPO.owner}/${REPO.name}`
-export const RELEASES_URL = `${REPO_URL}/releases`
-export const LATEST_API = `https://api.github.com/repos/${REPO.owner}/${REPO.name}/releases/latest`
+
+// Installers and latest.json live in our own Vercel Blob store (see scripts/publish-release.mjs).
+export const MANIFEST_URL: string =
+  import.meta.env.VITE_MANIFEST_URL ?? 'https://c6msr6ovuqmhahef.public.blob.vercel-storage.com/latest.json'

@@ -35,8 +35,7 @@ export default {
     mac: 'macOS',
     macReq: 'macOS 12 ขึ้นไป ทั้ง Apple Silicon และ Intel',
     get: 'ดาวน์โหลด',
-    viewReleases: 'ดูบน GitHub',
-    noRelease: 'ยังไม่มีตัวติดตั้งให้ดาวน์โหลด ลองดูหน้า releases',
+    noRelease: 'ตัวติดตั้งจะพร้อมให้ดาวน์โหลดเร็วๆ นี้',
     unsigned: 'ตัวติดตั้งยังไม่ได้ลงนามดิจิทัล Windows SmartScreen หรือ macOS Gatekeeper อาจเตือนตอนเปิดครั้งแรก',
   },
   faq: {

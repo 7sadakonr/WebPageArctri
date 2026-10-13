@@ -35,8 +35,7 @@ export default {
     mac: 'macOS',
     macReq: 'macOS 12+, Apple Silicon & Intel',
     get: 'Download',
-    viewReleases: 'View on GitHub',
-    noRelease: 'Installers are not published yet — check the releases page.',
+    noRelease: 'Installers are coming soon.',
     unsigned: 'Builds are not code-signed yet, so Windows SmartScreen or macOS Gatekeeper may warn on first launch.',
   },
   faq: {
