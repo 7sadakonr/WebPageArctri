@@ -35,6 +35,6 @@ const href = computed(() => {
         <a href="#download" class="border border-line px-5 py-3 text-fg/80 hover:bg-surface-2">{{ t('hero.allDownloads') }}</a>
       </div>
     </div>
-    <div class="relative mx-auto mt-16 max-w-4xl"><TerminalMockup /></div>
+    <div class="relative mx-auto mt-16 max-w-5xl"><TerminalMockup /></div>
   </section>
 </template>
