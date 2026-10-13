@@ -106,7 +106,7 @@ onBeforeUnmount(() => {
         v-for="(id, index) in ids"
         :key="id"
         v-show="positions[id] !== undefined"
-        class="absolute right-full mr-4 -translate-y-1/2 whitespace-nowrap rounded px-1 text-xs font-semibold uppercase tracking-widest transition-[top,color,background-color] duration-500 ease-out hover:text-fg motion-reduce:transition-none"
+        class="absolute right-full mr-4 -translate-y-1/2 whitespace-nowrap px-1 text-xs font-semibold uppercase tracking-widest transition-[top,color,background-color] duration-500 ease-out hover:text-fg motion-reduce:transition-none"
         :class="[
           active === id || open ? 'text-fg' : 'text-muted/70',
           open ? 'bg-bg/70' : 'bg-transparent',
