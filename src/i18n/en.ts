@@ -1,0 +1,52 @@
+export default {
+  nav: { features: 'Features', agents: 'Agents', download: 'Download', faq: 'FAQ' },
+  hero: {
+    badge: 'Beta',
+    title: 'The terminal built for AI coding agents',
+    subtitle: 'Real shells, command blocks, autocomplete, files and Git — wrapped around Claude Code and Codex CLI. Local-first, no account.',
+    downloadFor: 'Download for {os}',
+    allDownloads: 'All downloads',
+    version: 'Version {v}',
+    mobile: 'Available for Windows & macOS',
+  },
+  features: {
+    title: 'Everything your agent workflow needs',
+    items: [
+      { t: 'Real terminal', d: 'ConPTY-backed sessions with ANSI output, scrollback, copy/paste and resizing.' },
+      { t: 'Every shell', d: 'PowerShell 5.1 and 7, Command Prompt, and bash/zsh inside WSL distributions.' },
+      { t: 'Command blocks', d: 'Commands are grouped with exit status, duration, directory and output.' },
+      { t: 'Smart autocomplete', d: 'From history, executables, files, Git and npm scripts. Never runs automatically.' },
+      { t: 'Agent toolbar', d: 'Appears when an agent runs: file references, slash commands and changed files.' },
+      { t: 'Files & Git', d: 'Project tree, CodeMirror editor and diffs against Git HEAD.' },
+    ],
+  },
+  agents: {
+    title: 'Bring your own agent',
+    body: 'Arctri has no built-in model and no API keys. It detects Claude Code and OpenAI Codex CLI on Windows or WSL — whatever you have installed and signed into.',
+  },
+  privacy: {
+    title: 'Local-first by design',
+    body: 'Your projects and history stay on your machine. No account required.',
+  },
+  download: {
+    title: 'Download Arctri',
+    windows: 'Windows',
+    windowsReq: 'Windows 10 22H2 or 11, x64',
+    mac: 'macOS',
+    macReq: 'macOS 12+, Apple Silicon & Intel',
+    get: 'Download',
+    viewReleases: 'View on GitHub',
+    noRelease: 'Installers are not published yet — check the releases page.',
+    unsigned: 'Builds are not code-signed yet, so Windows SmartScreen or macOS Gatekeeper may warn on first launch.',
+  },
+  faq: {
+    title: 'FAQ',
+    items: [
+      { q: 'Is Arctri free?', a: 'Yes. Arctri is open source under the MIT license.' },
+      { q: 'Does it include an AI model?', a: 'No. It runs external CLIs such as Claude Code and Codex CLI that you install and sign into yourself.' },
+      { q: 'Why does Windows or macOS show a warning?', a: 'Builds are not code-signed or notarized yet. Choose "More info → Run anyway" on Windows, or open via right-click on macOS.' },
+      { q: 'Is Linux supported?', a: 'Not in this release.' },
+    ],
+  },
+  footer: { rights: 'MIT licensed. Made by Jetsadakorn Muangwichit.' },
+}

@@ -1,0 +1,52 @@
+export default {
+  nav: { features: 'ฟีเจอร์', agents: 'เอเจนต์', download: 'ดาวน์โหลด', faq: 'คำถามที่พบบ่อย' },
+  hero: {
+    badge: 'เบต้า',
+    title: 'เทอร์มินัลที่สร้างมาเพื่อ AI coding agent',
+    subtitle: 'เชลล์จริง command block ระบบเติมคำอัตโนมัติ ไฟล์และ Git ครอบ Claude Code กับ Codex CLI ไว้ในที่เดียว เก็บข้อมูลในเครื่อง ไม่ต้องสมัครบัญชี',
+    downloadFor: 'ดาวน์โหลดสำหรับ {os}',
+    allDownloads: 'ดาวน์โหลดทั้งหมด',
+    version: 'เวอร์ชัน {v}',
+    mobile: 'รองรับ Windows และ macOS',
+  },
+  features: {
+    title: 'ครบทุกอย่างสำหรับงานกับเอเจนต์',
+    items: [
+      { t: 'เทอร์มินัลจริง', d: 'เซสชันบน ConPTY รองรับสี ANSI, scrollback, คัดลอก/วาง และปรับขนาดหน้าต่าง' },
+      { t: 'รองรับทุกเชลล์', d: 'PowerShell 5.1 และ 7, Command Prompt และ bash/zsh ใน WSL' },
+      { t: 'Command blocks', d: 'จัดกลุ่มแต่ละคำสั่งพร้อมสถานะ เวลาที่ใช้ โฟลเดอร์ และผลลัพธ์' },
+      { t: 'เติมคำอัตโนมัติ', d: 'แนะนำจากประวัติ ไฟล์ Git และ npm scripts โดยไม่รันให้เอง' },
+      { t: 'แถบเครื่องมือเอเจนต์', d: 'โผล่ขึ้นมาเมื่อเอเจนต์ทำงาน อ้างอิงไฟล์ ใช้ slash command และดูไฟล์ที่เปลี่ยน' },
+      { t: 'ไฟล์และ Git', d: 'ต้นไม้ไฟล์ ตัวแก้ไข CodeMirror และ diff เทียบกับ Git HEAD' },
+    ],
+  },
+  agents: {
+    title: 'ใช้เอเจนต์ของคุณเอง',
+    body: 'Arctri ไม่มีโมเดลหรือ API key ในตัว แต่ตรวจพบ Claude Code และ OpenAI Codex CLI ที่ติดตั้งและล็อกอินไว้แล้วบน Windows หรือ WSL',
+  },
+  privacy: {
+    title: 'เก็บทุกอย่างไว้ในเครื่อง',
+    body: 'โปรเจกต์และประวัติอยู่ในเครื่องของคุณ ไม่ต้องมีบัญชี',
+  },
+  download: {
+    title: 'ดาวน์โหลด Arctri',
+    windows: 'Windows',
+    windowsReq: 'Windows 10 22H2 หรือ 11 แบบ x64',
+    mac: 'macOS',
+    macReq: 'macOS 12 ขึ้นไป ทั้ง Apple Silicon และ Intel',
+    get: 'ดาวน์โหลด',
+    viewReleases: 'ดูบน GitHub',
+    noRelease: 'ยังไม่มีตัวติดตั้งให้ดาวน์โหลด ลองดูหน้า releases',
+    unsigned: 'ตัวติดตั้งยังไม่ได้ลงนามดิจิทัล Windows SmartScreen หรือ macOS Gatekeeper อาจเตือนตอนเปิดครั้งแรก',
+  },
+  faq: {
+    title: 'คำถามที่พบบ่อย',
+    items: [
+      { q: 'Arctri ใช้ฟรีไหม', a: 'ฟรี เป็นโอเพนซอร์สภายใต้สัญญาอนุญาต MIT' },
+      { q: 'มีโมเดล AI มาให้ในตัวไหม', a: 'ไม่มี Arctri เรียกใช้ CLI ภายนอกอย่าง Claude Code และ Codex CLI ที่คุณติดตั้งและล็อกอินเอง' },
+      { q: 'ทำไม Windows หรือ macOS ขึ้นคำเตือน', a: 'เพราะตัวติดตั้งยังไม่ได้ลงนามหรือ notarize บน Windows เลือก "More info → Run anyway" ส่วน macOS ให้คลิกขวาแล้วเลือกเปิด' },
+      { q: 'รองรับ Linux ไหม', a: 'เวอร์ชันนี้ยังไม่รองรับ' },
+    ],
+  },
+  footer: { rights: 'สัญญาอนุญาต MIT พัฒนาโดย เจษฎากร เมืองวิชิต' },
+}
