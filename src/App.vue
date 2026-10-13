@@ -6,16 +6,18 @@ import AgentsSection from './components/AgentsSection.vue'
 import DownloadSection from './components/DownloadSection.vue'
 import FaqSection from './components/FaqSection.vue'
 import FooterSection from './components/FooterSection.vue'
+import ScrollRuler from './components/ScrollRuler.vue'
 </script>
 
 <template>
   <NavBar />
-  <main>
+  <ScrollRuler />
+  <main class="lg:pr-14">
     <HeroSection />
     <FeatureGrid />
     <AgentsSection />
     <DownloadSection />
     <FaqSection />
   </main>
-  <FooterSection />
+  <div class="lg:pr-14"><FooterSection /></div>
 </template>
