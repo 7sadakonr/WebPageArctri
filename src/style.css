@@ -3,13 +3,18 @@
 @theme {
   --font-sans: "Inter", "IBM Plex Sans Thai", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  --color-bg: #08090a;
-  --color-surface: #111214;
-  --color-accent: #7dd3fc;
+  --color-bg: #1c1f24;
+  --color-surface: #23272e;
+  --color-surface-2: #2b3038;
+  --color-line: #353b45;
+  --color-fg: #cdd3dc;
+  --color-muted: #8b949e;
+  --color-accent: #8fb8de;
+  --color-accent-fg: #1c1f24;
 }
 
-html { scroll-behavior: smooth; }
-body { background: var(--color-bg); color: #e8e8ea; font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+html { scroll-behavior: smooth; color-scheme: dark; }
+body { background: var(--color-bg); color: var(--color-fg); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 
 .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
 .reveal.in { opacity: 1; transform: none; }
