@@ -8,6 +8,9 @@ const ticks = Array.from({ length: 101 }, (_, i) => i)
 
 const progress = ref(0)
 const positions = ref<Record<string, number>>({})
+const hovered = ref(false)
+const focused = ref(false)
+const open = computed(() => hovered.value || focused.value)
 let raf = 0
 let ro: ResizeObserver | null = null
 
@@ -41,6 +44,12 @@ const active = computed(() => {
   return current
 })
 
+// Collapsed: labels stack at the bottom. Open: each label slides to its section position.
+function labelTop(id: string, index: number) {
+  if (!open.value) return `calc(100% - ${(ids.length - 1 - index) * 22}px)`
+  return `${positions.value[id] ?? 0}%`
+}
+
 function jump(id: string) {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   document.getElementById(id)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' })
@@ -64,39 +73,62 @@ onBeforeUnmount(() => {
 
 <template>
   <aside
-    class="fixed right-0 top-14 z-40 hidden h-[calc(100vh-3.5rem)] w-14 border-l border-line bg-bg/80 backdrop-blur-md lg:block"
+    class="fixed right-0 top-14 z-40 hidden h-[calc(100vh-3.5rem)] w-14 lg:block"
     aria-label="Page progress"
+    @mouseenter="hovered = true"
+    @mouseleave="hovered = false"
+    @focusin="focused = true"
+    @focusout="focused = false"
   >
+    <!-- panel background, only visible when open -->
+    <div
+      class="absolute inset-0 border-l border-line bg-bg/80 backdrop-blur-md transition-opacity duration-300"
+      :class="open ? 'opacity-100' : 'opacity-0'"
+    />
+
     <div class="absolute inset-x-0 bottom-9 top-3">
       <div
         v-for="i in ticks"
         :key="i"
-        class="absolute right-0 flex items-center"
+        class="absolute right-0 flex items-center transition-opacity duration-300"
+        :class="open ? 'opacity-100' : i % 5 === 0 ? 'opacity-30' : 'opacity-0'"
         :style="{ top: `${i}%`, transform: 'translateY(-50%)' }"
       >
-        <span v-if="i % 5 === 0" class="mr-1.5 font-mono text-[10px] leading-none text-muted">{{ i }}</span>
-        <span class="h-px bg-line" :class="i % 5 === 0 ? 'w-4 bg-muted/60' : 'w-2'" />
+        <span
+          v-if="i % 5 === 0"
+          class="mr-1.5 font-mono text-[10px] leading-none text-muted transition-opacity duration-300"
+          :class="open ? 'opacity-100' : 'opacity-0'"
+        >{{ i }}</span>
+        <span class="h-px" :class="i % 5 === 0 ? 'w-4 bg-muted' : 'w-2 bg-line'" />
       </div>
 
       <button
-        v-for="id in ids"
+        v-for="(id, index) in ids"
         :key="id"
         v-show="positions[id] !== undefined"
-        class="absolute right-full mr-4 -translate-y-1/2 whitespace-nowrap rounded bg-bg/70 px-1 text-xs font-semibold uppercase tracking-widest transition-colors hover:text-fg"
-        :class="active === id ? 'text-fg' : 'text-muted'"
-        :style="{ top: `${positions[id] ?? 0}%` }"
+        class="absolute right-full mr-4 -translate-y-1/2 whitespace-nowrap px-1 text-xs font-semibold uppercase tracking-widest transition-[top,color,background-color] duration-500 ease-out hover:text-fg motion-reduce:transition-none"
+        :class="[
+          active === id || open ? 'text-fg' : 'text-muted/70',
+          open ? 'bg-bg/70' : 'bg-transparent',
+        ]"
+        :style="{ top: labelTop(id, index) }"
         @click="jump(id)"
       >
         {{ t(`nav.${id}`) }}
       </button>
 
+      <!-- progress marker: short when collapsed, long when open -->
       <div
-        class="pointer-events-none absolute right-0 h-0.5 w-20 bg-fg shadow-[0_0_8px_rgba(205,211,220,0.5)]"
+        class="pointer-events-none absolute right-0 h-0.5 bg-fg transition-[width,opacity] duration-300"
+        :class="open ? 'w-20 opacity-100 shadow-[0_0_8px_rgba(205,211,220,0.5)]' : 'w-5 opacity-60'"
         :style="{ top: `${progress}%`, transform: 'translateY(-50%)' }"
       />
     </div>
 
-    <div class="absolute inset-x-0 bottom-0 flex h-9 items-center justify-center border-t border-line font-mono text-[10px] text-accent">
+    <div
+      class="absolute inset-x-0 bottom-0 flex h-9 items-center justify-center border-t border-line font-mono text-[10px] text-accent transition-opacity duration-300"
+      :class="open ? 'opacity-100' : 'opacity-0'"
+    >
       {{ Math.round(progress) }}%
     </div>
   </aside>

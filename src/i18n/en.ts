@@ -48,5 +48,22 @@ export default {
       { q: 'Is Linux supported?', a: 'Not in this release.' },
     ],
   },
+  mock: {
+    openHint: 'Open README.md',
+    readme: [
+      '# Arctri',
+      'An agent-first terminal for Windows and macOS.',
+      '',
+      '## What it does',
+      '- Real PTY shells: PowerShell, Command Prompt, WSL',
+      '- Command blocks with status, duration and output',
+      '- Autocomplete that never runs by itself',
+      '- Toolbar for Claude Code and Codex CLI',
+      '- Project files, editor and Git diffs',
+      '',
+      '## Good to know',
+      'Local-first. No account, no built-in model or API keys. Bring your own agent.',
+    ],
+  },
   footer: { rights: 'MIT licensed. Made by Jetsadakorn Muangwichit.' },
 }
