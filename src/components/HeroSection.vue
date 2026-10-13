@@ -5,7 +5,6 @@ import { Download } from 'lucide-vue-next'
 import TerminalMockup from './TerminalMockup.vue'
 import { detectOS, osLabel } from '../composables/useOS'
 import { useLatestRelease } from '../composables/useLatestRelease'
-import { RELEASES_URL } from '../config'
 
 const { t } = useI18n()
 const os = detectOS()
@@ -14,7 +13,7 @@ const { release } = useLatestRelease()
 const href = computed(() => {
   const r = release.value
   const asset = os === 'mac' ? (r?.macArm ?? r?.macIntel) : r?.windows
-  return asset?.browser_download_url ?? RELEASES_URL
+  return asset?.url ?? '#download'
 })
 </script>
 

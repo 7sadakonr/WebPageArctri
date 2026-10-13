@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "publish-release": "node --env-file-if-exists=.env.local scripts/publish-release.mjs"
   },
   "dependencies": {
     "lucide-vue-next": "^1.0.0",
@@ -15,6 +16,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@vercel/blob": "^2.8.1",
     "@vitejs/plugin-vue": "^6.0.10",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",
