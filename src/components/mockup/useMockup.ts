@@ -30,7 +30,7 @@ export function createMockup(initial: OS) {
   let uid = 1
   const next = () => uid++
 
-  const os = ref<OS>(initial)
+  const os = ref<OS>(initial) // fixed for the page's lifetime: detected from the visitor's browser
   const win = ref<WinState>('normal')
   const closed = ref(false)
   const branch = ref('main')
@@ -40,7 +40,7 @@ export function createMockup(initial: OS) {
   const editorOpen = ref(true)
   const sideTab = ref<'files' | 'git'>('files')
   const filter = ref('')
-  const expanded = ref<string[]>(['src'])
+  const expanded = ref<string[]>(['features'])
   const tabs = ref<string[]>(['README.md'])
   const activeFile = ref<string | null>('README.md')
   const activeLine = ref<number | null>(null)
@@ -69,13 +69,6 @@ export function createMockup(initial: OS) {
   const minimize = () => { win.value = 'minimized'; openMenu.value = null }
   const restore = () => { win.value = 'normal' }
   const toggleMaximize = () => { win.value = win.value === 'maximized' ? 'normal' : 'maximized' }
-
-  function setOS(o: OS) {
-    os.value = o
-    openMenu.value = null
-    terms.value = seed()
-    activeTerm.value = terms.value[0].id
-  }
 
   // ── menus ──
   const toggleMenu = (id: string) => { openMenu.value = openMenu.value === id ? null : id }
@@ -196,7 +189,7 @@ export function createMockup(initial: OS) {
     os, win, closed, branch, openMenu,
     filesOpen, editorOpen, sideTab, filter, expanded, tabs, activeFile, activeLine,
     selectedBlock, terms, activeTerm, activeTermObj, rows,
-    closeWindow, reopenWindow, minimize, restore, toggleMaximize, setOS,
+    closeWindow, reopenWindow, minimize, restore, toggleMaximize,
     toggleMenu, setMenu, closeMenus, runAction,
     newTerm, closeTerm, runCommand, clearTerm, exitAgent,
     openFile, closeFile, selectFile, toggleDir,

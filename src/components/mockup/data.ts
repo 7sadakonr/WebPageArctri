@@ -58,66 +58,38 @@ export const BRANCHES = ['main', 'dark-theme', 'feat/os-aware-mockup']
 
 export interface TreeNode { name: string; path: string; dir?: boolean; children?: TreeNode[] }
 
+// The demo project is Arctri's own documentation: each file explains one part of the app.
 export const TREE: TreeNode[] = [
-  { name: 'dist', path: 'dist', dir: true, children: [
-    { name: 'index.html', path: 'dist/index.html' },
+  { name: 'features', path: 'features', dir: true, children: [
+    { name: 'terminal.md', path: 'features/terminal.md' },
+    { name: 'shells.md', path: 'features/shells.md' },
+    { name: 'command-blocks.md', path: 'features/command-blocks.md' },
+    { name: 'autocomplete.md', path: 'features/autocomplete.md' },
+    { name: 'agents.md', path: 'features/agents.md' },
+    { name: 'files-and-git.md', path: 'features/files-and-git.md' },
+    { name: 'workspace.md', path: 'features/workspace.md' },
   ] },
-  { name: 'node_modules', path: 'node_modules', dir: true, children: [
-    { name: '.package-lock.json', path: 'node_modules/.package-lock.json' },
-  ] },
-  { name: 'public', path: 'public', dir: true, children: [
-    { name: 'icon.png', path: 'public/icon.png' },
-  ] },
-  { name: 'src', path: 'src', dir: true, children: [
-    { name: 'components', path: 'src/components', dir: true, children: [
-      { name: 'HeroSection.vue', path: 'src/components/HeroSection.vue' },
-      { name: 'NavBar.vue', path: 'src/components/NavBar.vue' },
-    ] },
-    { name: 'App.vue', path: 'src/App.vue' },
-    { name: 'main.ts', path: 'src/main.ts' },
-    { name: 'style.css', path: 'src/style.css' },
-  ] },
-  { name: 'index.html', path: 'index.html' },
   { name: 'README.md', path: 'README.md' },
+  { name: 'requirements.md', path: 'requirements.md' },
+  { name: 'privacy.md', path: 'privacy.md' },
   { name: 'LICENSE', path: 'LICENSE' },
-  { name: 'package.json', path: 'package.json' },
-  { name: 'vite.config.ts', path: 'vite.config.ts' },
 ]
 
-// README.md comes from i18n (mock.readme); everything else is static.
+// Document files get their text from i18n: mock.docs.<key> (English and Thai).
+export const DOC_KEYS: Record<string, string> = {
+  'README.md': 'readme',
+  'features/terminal.md': 'terminal',
+  'features/shells.md': 'shells',
+  'features/command-blocks.md': 'blocks',
+  'features/autocomplete.md': 'autocomplete',
+  'features/agents.md': 'agents',
+  'features/files-and-git.md': 'files',
+  'features/workspace.md': 'workspace',
+  'requirements.md': 'requirements',
+  'privacy.md': 'privacy',
+}
+
 export const FILES: Record<string, string[]> = {
-  'index.html': [
-    '<!doctype html>',
-    '<html lang="en">',
-    '  <head>',
-    '    <meta charset="UTF-8" />',
-    '    <title>Arctri — The agent-first terminal</title>',
-    '    <link rel="icon" href="/icon.png" />',
-    '  </head>',
-    '  <body>',
-    '    <div id="app"></div>',
-    '    <script type="module" src="/src/main.ts"></script>',
-    '  </body>',
-    '</html>',
-  ],
-  'package.json': [
-    '{',
-    '  "name": "arctri-website",',
-    '  "private": true,',
-    '  "type": "module",',
-    '  "scripts": {',
-    '    "dev": "vite",',
-    '    "build": "vue-tsc --noEmit && vite build"',
-    '  }',
-    '}',
-  ],
-  'vite.config.ts': [
-    "import { defineConfig } from 'vite'",
-    "import vue from '@vitejs/plugin-vue'",
-    "import tailwindcss from '@tailwindcss/vite'",
-    '',
-    'export default defineConfig({ plugins: [vue(), tailwindcss()] })',
-  ],
   LICENSE: [
     'MIT License',
     '',
@@ -125,53 +97,11 @@ export const FILES: Record<string, string[]> = {
     'of this software and associated documentation files (the "Software"), to deal',
     'in the Software without restriction.',
   ],
-  'src/App.vue': [
-    '<script setup lang="ts">',
-    "import NavBar from './components/NavBar.vue'",
-    "import HeroSection from './components/HeroSection.vue'",
-    '</script>',
-    '',
-    '<template>',
-    '  <NavBar />',
-    '  <main>',
-    '    <HeroSection />',
-    '  </main>',
-    '</template>',
-  ],
-  'src/main.ts': [
-    "import { createApp } from 'vue'",
-    "import App from './App.vue'",
-    "import './style.css'",
-    '',
-    "createApp(App).mount('#app')",
-  ],
-  'src/style.css': [
-    '@import "tailwindcss";',
-    '',
-    'html { scroll-behavior: smooth; }',
-  ],
-  'src/components/HeroSection.vue': [
-    '<template>',
-    '  <section class="relative px-5 pt-36 text-center">',
-    '    <h1>The terminal built for AI coding agents</h1>',
-    '  </section>',
-    '</template>',
-  ],
-  'src/components/NavBar.vue': [
-    '<template>',
-    '  <header class="fixed inset-x-0 top-0 z-50">',
-    '    <a href="#">Arctri</a>',
-    '  </header>',
-    '</template>',
-  ],
-  'dist/index.html': ['<!doctype html>', '<!-- built output -->'],
-  'node_modules/.package-lock.json': ['{', '  "lockfileVersion": 3', '}'],
-  'public/icon.png': ['(binary file, no preview available)'],
 }
 
 export const CHANGED = [
-  { flag: 'M', path: 'src/App.vue' },
   { flag: 'M', path: 'README.md' },
+  { flag: 'M', path: 'features/agents.md' },
 ]
 
 export const KNOWN_COMMANDS = [

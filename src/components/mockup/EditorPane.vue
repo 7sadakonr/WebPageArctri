@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { FileText, X } from 'lucide-vue-next'
-import { FILES } from './data'
+import { DOC_KEYS, FILES } from './data'
 import { useMockup } from './useMockup'
 
 const { t, tm } = useI18n()
@@ -13,7 +13,8 @@ const base = (p: string) => p.split('/').pop() ?? p
 const lines = computed<string[]>(() => {
   const f = m.activeFile
   if (!f) return []
-  if (f === 'README.md') return tm('mock.readme') as string[]
+  const key = DOC_KEYS[f]
+  if (key) return tm(`mock.docs.${key}`) as string[]
   return FILES[f] ?? ['(no preview available)']
 })
 
@@ -21,7 +22,7 @@ interface Token { t: string; c: string }
 const TOKEN_RE = /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|(\/\/.*|<!--.*?-->)|\b(import|export|from|const|let|default|function|return)\b|(<\/?[A-Za-z][\w-]*)/g
 
 function tokens(line: string): Token[] {
-  if (m.activeFile === 'README.md') {
+  if (m.activeFile?.endsWith('.md')) {
     const c = line.startsWith('#') ? 'font-semibold text-accent' : line.startsWith('- ') ? 'text-fg/80' : 'text-fg/70'
     return [{ t: line || ' ', c }]
   }
