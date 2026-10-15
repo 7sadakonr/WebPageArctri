@@ -2,8 +2,9 @@ import { createI18n } from 'vue-i18n'
 import en from './en'
 import th from './th'
 
-const saved = localStorage.getItem('locale')
-const initial = saved ?? (navigator.language.toLowerCase().startsWith('th') ? 'th' : 'en')
+// The site always opens in English. Visitors can switch to Thai with the TH button;
+// the choice lasts for the current visit only.
+const initial = 'en'
 
 export const i18n = createI18n({
   legacy: false,
@@ -14,7 +15,6 @@ export const i18n = createI18n({
 
 export function setLocale(l: 'en' | 'th') {
   i18n.global.locale.value = l
-  localStorage.setItem('locale', l)
   document.documentElement.lang = l
 }
 
