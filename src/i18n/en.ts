@@ -49,6 +49,9 @@ export default {
   },
   mock: {
     openHint: 'Open README.md',
+    reopen: 'Reopen Arctri',
+    preview: 'Preview as',
+    newTerminal: 'New terminal',
     readme: [
       '# Arctri',
       'An agent-first terminal for Windows and macOS.',
