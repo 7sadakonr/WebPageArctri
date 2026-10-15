@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "publish-release": "node --env-file-if-exists=.env.local scripts/publish-release.mjs"
+    "publish-release": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/publish-release.mjs"
   },
   "dependencies": {
     "lucide-vue-next": "^1.0.0",
