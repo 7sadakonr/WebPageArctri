@@ -49,6 +49,9 @@ export default {
   },
   mock: {
     openHint: 'เปิด README.md',
+    reopen: 'เปิด Arctri อีกครั้ง',
+    preview: 'ดูตัวอย่างบน',
+    newTerminal: 'เทอร์มินัลใหม่',
     readme: [
       '# Arctri',
       'เทอร์มินัลที่ออกแบบมาเพื่อ AI agent บน Windows และ macOS',
