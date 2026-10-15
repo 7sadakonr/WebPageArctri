@@ -1,0 +1,39 @@
+name: Sync release downloads
+
+# Keeps the website's download buttons in step with the newest Arctri app release.
+# Needs one repo secret: BLOB_READ_WRITE_TOKEN (Vercel Blob store arctri-downloads).
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Re-publish even if the version has not changed
+        type: boolean
+        default: false
+  repository_dispatch:
+    types: [app-release]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-release
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node scripts/sync-release.mjs
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+          FORCE: ${{ inputs.force }}
