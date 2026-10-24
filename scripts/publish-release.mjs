@@ -21,6 +21,10 @@ const { values } = parseArgs({
   },
 })
 
+// A pasted CI secret often carries a trailing newline, which makes the Authorization header invalid.
+if (process.env.BLOB_READ_WRITE_TOKEN) {
+  process.env.BLOB_READ_WRITE_TOKEN = process.env.BLOB_READ_WRITE_TOKEN.replace(/\s+/g, '')
+}
 if (!process.env.BLOB_READ_WRITE_TOKEN) {
   console.error('Missing BLOB_READ_WRITE_TOKEN (add it to .env.local).')
   process.exit(1)
