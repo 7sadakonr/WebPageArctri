@@ -7,7 +7,9 @@
 //
 // Needs BLOB_READ_WRITE_TOKEN (put it in .env.local, which is git-ignored).
 // latest.json is rebuilt from the flags you pass, so pass every platform you want listed.
-import { put } from '@vercel/blob'
+// After a successful publish every older releases/<version>/ folder is deleted, so only the
+// newest version stays in the store (the free tier is 1 GB). DRY_RUN=1 lists what would go.
+import { del, list, put } from '@vercel/blob'
 import { createReadStream, statSync } from 'node:fs'
 import { basename } from 'node:path'
 import { parseArgs } from 'node:util'
@@ -59,3 +61,20 @@ const latest = await put('latest.json', JSON.stringify(manifest, null, 2), {
 })
 console.log(`\nManifest: ${latest.url}`)
 console.log('If this differs from MANIFEST_URL in src/config.ts, set VITE_MANIFEST_URL on Vercel to this URL.')
+
+// Prune old versions only after the new files and manifest are safely published.
+const keep = `releases/${values.version}/`
+const stale = []
+let cursor
+do {
+  const page = await list({ prefix: 'releases/', cursor })
+  for (const b of page.blobs) if (!b.pathname.startsWith(keep)) stale.push(b)
+  cursor = page.hasMore ? page.cursor : undefined
+} while (cursor)
+
+if (stale.length) {
+  const mb = (stale.reduce((n, b) => n + b.size, 0) / 1048576).toFixed(1)
+  for (const b of stale) console.log(`${process.env.DRY_RUN ? 'would delete' : 'deleting'} ${b.pathname}`)
+  if (!process.env.DRY_RUN) await del(stale.map((b) => b.url))
+  console.log(`${process.env.DRY_RUN ? 'Would free' : 'Freed'} ${mb} MB from ${stale.length} old file(s).`)
+}
