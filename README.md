@@ -101,6 +101,28 @@ npm run publish-release -- --version 0.3.0-beta \
 
 File paths above are **examples**: provide the actual installer paths. Set `BLOB_READ_WRITE_TOKEN` in your private local environment before running the command. The manual publish script removes older release blobs after publishing a new manifest, so use it only when you intend to replace the current downloads.
 
+## Admin Analytics (`/admin`)
+
+A password-protected dashboard at `/admin` shows page visits (Vercel Web Analytics) and release download counts (GitHub). Design: `docs/superpowers/specs/2026-11-11-admin-analytics-design.md`.
+
+Set these in the Vercel project's environment variables (server-side only, **never** `VITE_*`):
+
+| Variable | Purpose |
+| --- | --- |
+| `ADMIN_PASSWORD` | Shared dashboard password |
+| `ADMIN_SESSION_SECRET` | Long random string used to sign the 12-hour session cookie |
+| `VERCEL_ACCESS_TOKEN` | Vercel token (scope: the team that owns this project) used to query Web Analytics |
+| `VERCEL_PROJECT_ID` | This project's ID (Project Settings → General) |
+| `VERCEL_TEAM_ID` | Optional, if the project belongs to a team |
+| `GITHUB_TOKEN` | Optional, raises the GitHub API rate limit |
+
+One-time setup in the Vercel dashboard:
+
+1. Enable **Web Analytics** for the project (data starts accumulating after the next deploy).
+2. Add a Firewall rate-limit rule for `/api/admin/login` (about 5 requests per minute per IP) to slow down password guessing.
+
+Notes: visit counts are lower bounds (ad-blockers hide some visits). Clicks on the website download buttons are **not** counted because querying custom events needs a Vercel Pro plan; the downloads table shows GitHub's own all-time counts only. Run `npm test` for the test suite and `npm run typecheck:api` for the serverless functions.
+
 ## Project Structure
 
 ```text
@@ -108,9 +130,11 @@ WebPageArctri/
 ├── src/
 │   ├── components/           # Landing page and terminal mockup
 │   ├── composables/          # Latest release and OS detection
+│   ├── admin/                # /admin dashboard (lazy-loaded)
 │   ├── i18n/                 # English / Thai translations
 │   ├── config.ts             # Repository and manifest configuration
 │   └── App.vue               # Page composition
+├── api/                      # Vercel Functions for /admin (login, overview)
 ├── public/                   # Branding assets
 ├── scripts/                  # Release publish/sync utilities
 ├── .github/workflows/        # Release synchronization workflow
