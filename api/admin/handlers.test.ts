@@ -37,7 +37,7 @@ describe('login / logout', () => {
     expect(res.headers.get('set-cookie')).toContain('HttpOnly')
   })
   it('logout clears the cookie', async () => {
-    const res = await logout(new Request('https://x.test', { method: 'POST' }))
+    const res = await logout()
     expect(res.status).toBe(204)
     expect(res.headers.get('set-cookie')).toContain('Max-Age=0')
   })
