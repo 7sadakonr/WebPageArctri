@@ -162,5 +162,13 @@ export default {
       ],
     },
   },
+  admin: {
+    title: 'Analytics',
+    logout: 'Log out',
+    loading: 'Loading…',
+    login: { title: 'Admin login', password: 'Password', submit: 'Log in', wrong: 'Wrong password.' },
+    error: { generic: 'Something went wrong. Please try again.' },
+    dashboard: { visits: 'Visits' },
+  },
   footer: { rights: 'MIT licensed. Made by Jetsadakorn Muangwichit.' },
 }

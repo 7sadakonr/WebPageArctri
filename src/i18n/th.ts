@@ -162,5 +162,13 @@ export default {
       ],
     },
   },
+  admin: {
+    title: 'สถิติ',
+    logout: 'ออกจากระบบ',
+    loading: 'กำลังโหลด…',
+    login: { title: 'เข้าสู่ระบบผู้ดูแล', password: 'รหัสผ่าน', submit: 'เข้าสู่ระบบ', wrong: 'รหัสผ่านไม่ถูกต้อง' },
+    error: { generic: 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง' },
+    dashboard: { visits: 'ยอดเข้าชม' },
+  },
   footer: { rights: 'สัญญาอนุญาต MIT พัฒนาโดย เจษฎากร เมืองวิชิต' },
 }
