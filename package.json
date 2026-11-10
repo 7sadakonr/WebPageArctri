@@ -8,7 +8,8 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "publish-release": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/publish-release.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "typecheck:api": "tsc -p tsconfig.api.json"
   },
   "dependencies": {
     "lucide-vue-next": "^1.0.0",
@@ -17,6 +18,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^22.20.5",
     "@vercel/blob": "^2.8.1",
     "@vitejs/plugin-vue": "^6.0.10",
     "tailwindcss": "^4.3.3",
