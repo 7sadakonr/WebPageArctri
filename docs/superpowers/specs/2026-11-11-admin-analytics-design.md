@@ -8,10 +8,10 @@ A password-protected `/admin` page in the existing Arctri website that shows
 web traffic and download analytics for the site owner / a small team.
 
 **In scope**
-- Overview dashboard: visits, download clicks, OS split, countries, referrers,
-  time series, per-version GitHub download counts. Range selector 7 / 30 / 90 days.
+- Overview dashboard: visits, OS split, countries, referrers, time series,
+  per-version GitHub download counts. Range selector 7 / 30 / 90 days.
 - Single shared-password login, signed-cookie session.
-- Collecting data on the public site (Vercel Web Analytics + `download_click` event).
+- Collecting page-view data on the public site (Vercel Web Analytics).
 
 **Out of scope (YAGNI)**
 - User accounts / roles, own database, own event store, redirect-based download counting.
@@ -25,7 +25,7 @@ private but not highly sensitive.
 | Source | Gives | Limits |
 |---|---|---|
 | Vercel Web Analytics REST API `GET /v1/query/web-analytics/visits/aggregate` | visits by country, OS, referrer, path, UTM, time | Needs Vercel access token + `projectId`; plan support to verify |
-| Vercel custom event `download_click` (`platform`, `version`) | download intent per platform/version | Click is not a completed download; ad-blockers drop events; custom-event query support on the plan is **to verify before implementation** |
+| ~~Vercel custom event `download_click`~~ (dropped) | n/a | Probe on 2026-11-11: events API returns 402, needs Pro/Enterprise. Owner chose not to upgrade. Website download-button clicks are therefore **not counted** |
 | GitHub Releases API `download_count` | per-asset counts | Installers are mirrored to Vercel Blob, so this only counts direct GitHub downloads; shown as a supplementary figure |
 
 Data starts accumulating only after deploy. All figures are lower-bound estimates.
@@ -65,12 +65,12 @@ Tokens live only in server env (no `VITE_` prefix) and never reach the client bu
 {
   range: 7|30|90,
   sources: { vercel: "ok"|"error", github: "ok"|"error" },
-  totals: { visits, downloadClicks },
-  series: [{ date, visits, downloadClicks }],
+  totals: { visits, githubDownloads },
+  series: [{ date, visits }],            // Vercel `by=day`
   byOs: [{ name, visits }],
   byCountry: [{ code, visits }],
   byReferrer: [{ host, visits }],
-  downloads: [{ version, platform, clicks, githubCount }]
+  downloads: [{ version, platform: "windows"|"mac-arm"|"mac-intel"|"other", githubCount }]  // all-time per release asset, not range-filtered
 }
 ```
 `Cache-Control: private, max-age=300`.
@@ -113,8 +113,7 @@ accessibility when building it. i18n keys `admin.*` added to `en.ts` and `th.ts`
 
 1. Add `@vercel/analytics`; call `inject()` in the landing path of `main.ts` only
    (so `/admin` visits are not counted).
-2. `DownloadSection.vue`: `@click` on download links calls
-   `track('download_click', { platform, version })`.
+2. (Removed: no download-click tracking, see section 2.)
 3. `index.html` / `public/robots.txt`: noindex and `Disallow: /admin`.
 
 ## 5. Configuration (owner must provide)
@@ -135,6 +134,7 @@ Add Vitest (fits the existing Vite setup).
 
 ## 7. Open items to verify before / during implementation
 
-1. Vercel plan supports Web Analytics custom events and querying them via REST.
-2. Exact event-query endpoint / parameters for `download_click`.
+1. ~~Custom events~~ Resolved 2026-11-11: not available on the current plan; dropped (see
+   `docs/superpowers/notes/2026-11-11-analytics-probe.md`).
+2. Visits API confirmed: `by` accepts `day`, `osName`, `country`, `referrerHostname`, etc.
 3. Confirm the audience assumption in section 1.

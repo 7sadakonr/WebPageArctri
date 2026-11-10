@@ -100,7 +100,7 @@ git commit -m "chore: add vitest and record analytics API probe"
   - `fetchGithubDownloads(repo: {owner: string; name: string}, token?: string, fetchImpl?: typeof fetch): Promise<GithubRaw>`
   - `buildOverview(range: Range, vercel: VercelRaw | Error, github: GithubRaw | Error): Overview`, where an `Error` argument sets that source to `"error"` and leaves its fields empty.
 
-- [ ] **Step 1: Write failing tests**: both sources OK (totals and series match fixture sums); Vercel `data: []` gives zeros and empty arrays with `sources.vercel = "ok"` (Review Focus 3); Vercel `Error` gives `sources.vercel = "error"` while GitHub data is still present (Review Focus 4); GitHub `Error` mirror case; `downloads` rows join clicks and `githubCount` by `version`+`platform`.
+- [ ] **Step 1: Write failing tests**: both sources OK (totals and series match fixture sums); Vercel `data: []` gives zeros and empty arrays with `sources.vercel = "ok"` (Review Focus 3); Vercel `Error` gives `sources.vercel = "error"` while GitHub data is still present (Review Focus 4); GitHub `Error` mirror case; `downloads` rows map each GitHub release asset to `{version, platform, githubCount}` (platform from the asset name: `Setup…x64.exe` windows, `arm64.dmg` mac-arm, `x64.dmg` mac-intel, else other); `totals.githubDownloads` is their sum. (Revised 2026-11-11: custom events dropped, see probe notes.)
 - [ ] **Step 2: Run** `npx vitest run api/_lib/overview.test.ts`. Expected: FAIL.
 - [ ] **Step 3: Implement** the three modules. Clients throw on non-2xx; they take `fetchImpl` for mocking. `REPO` comes from the same owner/name as `src/config.ts` (pass in, do not import from `src`).
 - [ ] **Step 4: Run** the same command. Expected: PASS.
@@ -147,7 +147,7 @@ git commit -m "chore: add vitest and record analytics API probe"
 
 **Interfaces:**
 - Consumes: `Overview` and `useOverview`. Each card receives its slice plus `sources.*` and shows the translated "could not load" state when that source is `"error"`.
-- Produces: `TimeSeries` props `{ series: {date: string; visits: number; downloadClicks: number}[] }`, hand-written SVG, two series with distinguishable non-color cues, `role="img"` with an `aria-label` summary.
+- Produces: `TimeSeries` props `{ series: {date: string; visits: number}[] }`, hand-written SVG single line, `role="img"` with an `aria-label` summary. `DownloadsTable` labels its numbers as GitHub-only, all-time.
 
 - [ ] **Step 1: Load the `dataviz` skill** and apply its palette and accessibility rules to `TimeSeries`.
 - [ ] **Step 2: Implement** the components and `Dashboard` with the 7/30/90 selector (default 30). Reuse existing tokens (`bg-surface`, `border-line`, `text-accent`).
@@ -155,14 +155,13 @@ git commit -m "chore: add vitest and record analytics API probe"
 - [ ] **Step 4: Run** `npm run build`. Expected: succeeds.
 - [ ] **Step 5: Commit** `feat(admin): dashboard UI`.
 
-### Task 7: Public-site instrumentation and docs
+### Task 7: Docs (revised: no download-click tracking)
 
 **Files:**
-- Modify: `src/components/DownloadSection.vue` (download links call `track('download_click', { platform, version })` from `@vercel/analytics` on click; `platform` values `windows`, `mac-arm`, `mac-intel`; `version` is `release.tag`), `README.md` (env var table from spec §5, setup steps, the lower-bound caveat)
-- Modify: `package.json` (`@vercel/analytics`)
+- Modify: `README.md` (env var table from spec §5, setup steps, the lower-bound caveat, and that website download clicks are not counted)
 
-- [ ] **Step 1: Implement** the click tracking; `track` must not throw if blocked (wrap in try/catch).
-- [ ] **Step 2: Verify**: `npm run build` passes; in dev, clicking a download button fires one `download_click` with the right payload (browser network panel or console stub).
+- [ ] **Step 1: Verify** `npm run build` passes and the landing page still calls `inject()` once (done in Task 5).
+- [ ] **Step 2: (removed)**
 - [ ] **Step 3: Update README**, including the manual dashboard steps (enable Web Analytics, create token, add login rate-limit rule).
 - [ ] **Step 4: Commit** `feat: track download clicks and document admin setup`.
 
