@@ -6,6 +6,7 @@ import BreakdownTable from './components/BreakdownTable.vue'
 import DownloadsTable from './components/DownloadsTable.vue'
 import StatCard from './components/StatCard.vue'
 import TimeSeries from './components/TimeSeries.vue'
+import { regionName } from './regionName'
 
 const props = defineProps<{ data: Overview; range: Range }>()
 defineEmits<{ 'update:range': [Range] }>()
@@ -14,10 +15,7 @@ const { t, locale } = useI18n()
 const ranges: Range[] = [7, 30, 90]
 const vFail = computed(() => props.data.sources.vercel === 'error')
 const gFail = computed(() => props.data.sources.github === 'error')
-const countries = computed(() => {
-  const names = (() => { try { return new Intl.DisplayNames([locale.value], { type: 'region' }) } catch { return null } })()
-  return props.data.byCountry.map((r) => ({ name: (r.code && names?.of(r.code)) || r.code, visits: r.visits }))
-})
+const countries = computed(() => props.data.byCountry.map((r) => ({ name: regionName(r.code, locale.value), visits: r.visits })))
 const referrers = computed(() => props.data.byReferrer.map((r) => ({ name: r.host || t('admin.dashboard.direct'), visits: r.visits })))
 </script>
 

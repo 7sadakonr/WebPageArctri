@@ -8,7 +8,7 @@ export async function fetchVercelStats(range: Range, env: VercelEnv, fetchImpl: 
   const until = new Date()
   const since = new Date(until.getTime() - range * DAY)
   const query = async (by: string): Promise<VercelRow[]> => {
-    const q = new URLSearchParams({ projectId: env.projectId, by, since: since.toISOString(), until: until.toISOString(), limit: '50' })
+    const q = new URLSearchParams({ projectId: env.projectId, by, since: since.toISOString(), until: until.toISOString(), limit: by === 'day' ? String(range + 1) : '50' })
     if (env.teamId) q.set('teamId', env.teamId)
     const res = await fetchImpl(`https://api.vercel.com/v1/query/web-analytics/visits/aggregate?${q}`, {
       headers: { Authorization: `Bearer ${env.token}` },

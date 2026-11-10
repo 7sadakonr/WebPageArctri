@@ -79,6 +79,16 @@ describe('fetchVercelStats', () => {
     expect(new URL(urls[0]).searchParams.get('teamId')).toBe('team_1')
     expect(headers.every((h) => h === 'Bearer tok')).toBe(true)
   })
+  it('requests enough daily rows to cover the whole range', async () => {
+    const limits: Record<string, number> = {}
+    const fake = (async (url: string) => {
+      const u = new URL(url)
+      limits[u.searchParams.get('by')!] = Number(u.searchParams.get('limit'))
+      return new Response(JSON.stringify({ data: [] }), { status: 200 })
+    }) as unknown as typeof fetch
+    await fetchVercelStats(90, { token: 't', projectId: 'p' }, fake)
+    expect(limits.day).toBeGreaterThanOrEqual(90)
+  })
   it('throws on a non-2xx response', async () => {
     const fake = (async () => new Response('{}', { status: 403 })) as unknown as typeof fetch
     await expect(fetchVercelStats(7, { token: 't', projectId: 'p' }, fake)).rejects.toThrow(/403/)
