@@ -5,7 +5,7 @@ export type SourceStatus = 'ok' | 'error'
 export interface Overview {
   range: Range
   sources: { vercel: SourceStatus; github: SourceStatus }
-  totals: { visits: number; githubDownloads: number }
+  totals: { visits: number; githubDownloads: number; visitsPrevious: number; visitsChangePct: number | null }
   series: { date: string; visits: number }[]
   byOs: { name: string; visits: number }[]
   byCountry: { code: string; visits: number }[]
@@ -17,6 +17,7 @@ export interface Overview {
 export type VercelRow = Record<string, string | number | undefined>
 export interface VercelRaw {
   series: VercelRow[]
+  previousSeries: VercelRow[]
   byOs: VercelRow[]
   byCountry: VercelRow[]
   byReferrer: VercelRow[]

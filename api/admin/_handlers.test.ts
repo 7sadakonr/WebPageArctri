@@ -63,7 +63,7 @@ describe('overview', () => {
     expect(res.headers.get('cache-control')).toBe('private, max-age=300')
     const body = await res.json()
     expect(body.sources).toEqual({ vercel: 'ok', github: 'ok' })
-    expect(body.totals).toEqual({ visits: 4, githubDownloads: 2 })
+    expect(body.totals).toEqual({ visits: 4, githubDownloads: 2, visitsPrevious: 4, visitsChangePct: 0 })
   })
   it('200 with sources.vercel=error when Vercel fails', async () => {
     mockUpstreams({ vercel: 500 })

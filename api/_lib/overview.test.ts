@@ -1,10 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { buildOverview } from './overview'
 import { fetchVercelStats } from './vercelAnalytics'
 import { fetchGithubDownloads } from './githubReleases'
 import type { GithubRaw, VercelRaw } from './types'
 
 const vercel: VercelRaw = {
+  previousSeries: [{ timestamp: '2026-10-01T00:00:00.000Z', pageviews: 12, visitors: 10 }],
   series: [
     { timestamp: '2026-11-01T00:00:00.000Z', pageviews: 12, visitors: 10 },
     { timestamp: '2026-11-02T00:00:00.000Z', pageviews: 6, visitors: 5 },
@@ -26,7 +27,7 @@ describe('buildOverview', () => {
   it('condenses both sources', () => {
     const o = buildOverview(30, vercel, github)
     expect(o.sources).toEqual({ vercel: 'ok', github: 'ok' })
-    expect(o.totals).toEqual({ visits: 15, githubDownloads: 56 })
+    expect(o.totals).toEqual({ visits: 15, githubDownloads: 56, visitsPrevious: 10, visitsChangePct: 50 })
     expect(o.series).toEqual([{ date: '2026-11-01', visits: 10 }, { date: '2026-11-02', visits: 5 }])
     expect(o.byOs).toEqual([{ name: 'macOS', visits: 9 }, { name: 'Windows', visits: 6 }])
     expect(o.byCountry[0]).toEqual({ code: 'TH', visits: 11 })
@@ -39,24 +40,32 @@ describe('buildOverview', () => {
     ])
   })
   it('returns zeros and empty lists for a site with no traffic', () => {
-    const empty: VercelRaw = { series: [], byOs: [], byCountry: [], byReferrer: [] }
+    const empty: VercelRaw = { previousSeries: [], series: [], byOs: [], byCountry: [], byReferrer: [] }
     const o = buildOverview(7, empty, { assets: [] })
     expect(o.sources).toEqual({ vercel: 'ok', github: 'ok' })
-    expect(o.totals).toEqual({ visits: 0, githubDownloads: 0 })
+    expect(o.totals).toEqual({ visits: 0, githubDownloads: 0, visitsPrevious: 0, visitsChangePct: null })
     expect([o.series, o.byOs, o.byCountry, o.byReferrer, o.downloads]).toEqual([[], [], [], [], []])
   })
   it('keeps GitHub data when Vercel fails', () => {
     const o = buildOverview(30, new Error('boom'), github)
     expect(o.sources).toEqual({ vercel: 'error', github: 'ok' })
-    expect(o.totals.visits).toBe(0)
+    expect(o.totals).toMatchObject({ visits: 0, visitsPrevious: 0, visitsChangePct: null })
     expect(o.series).toEqual([])
     expect(o.totals.githubDownloads).toBe(56)
   })
   it('keeps Vercel data when GitHub fails', () => {
     const o = buildOverview(30, vercel, new Error('boom'))
     expect(o.sources).toEqual({ vercel: 'ok', github: 'error' })
-    expect(o.totals).toEqual({ visits: 15, githubDownloads: 0 })
+    expect(o.totals).toMatchObject({ visits: 15, githubDownloads: 0 })
     expect(o.downloads).toEqual([])
+  })
+  it('reports a decrease, no change, and no percentage when the previous period is empty', () => {
+    const prev = (n: number): VercelRaw => ({ ...vercel, previousSeries: [{ timestamp: '2026-10-01T00:00:00.000Z', visitors: n }] })
+    expect(buildOverview(30, prev(20), github).totals.visitsChangePct).toBe(-25)
+    expect(buildOverview(30, prev(15), github).totals.visitsChangePct).toBe(0)
+    const none = buildOverview(30, prev(0), github).totals
+    expect(none.visitsPrevious).toBe(0)
+    expect(none.visitsChangePct).toBeNull()
   })
   it('falls back to pageviews and skips rows without a count', () => {
     const o = buildOverview(7, { ...vercel, byOs: [{ osName: 'Linux', pageviews: 3 }, { osName: 'X' }] }, github)
@@ -65,29 +74,41 @@ describe('buildOverview', () => {
 })
 
 describe('fetchVercelStats', () => {
-  it('queries four dimensions with bearer auth and team id', async () => {
-    const urls: string[] = []
-    const headers: string[] = []
+  afterEach(() => vi.useRealTimers())
+  const capture = () => {
+    const calls: { url: URL; auth: string }[] = []
     const fake = (async (url: string, init: RequestInit) => {
-      urls.push(String(url)); headers.push(String((init.headers as Record<string, string>).Authorization))
+      calls.push({ url: new URL(String(url)), auth: String((init.headers as Record<string, string>).Authorization) })
       return new Response(JSON.stringify({ data: [] }), { status: 200 })
     }) as unknown as typeof fetch
+    return { calls, fake }
+  }
+  it('queries four dimensions plus the previous window with bearer auth and team id', async () => {
+    const { calls, fake } = capture()
     await fetchVercelStats(30, { token: 'tok', projectId: 'prj_1', teamId: 'team_1' }, fake)
-    const bys = urls.map((u) => new URL(u).searchParams.get('by')).sort()
-    expect(bys).toEqual(['country', 'day', 'osName', 'referrerHostname'])
-    expect(new URL(urls[0]).searchParams.get('projectId')).toBe('prj_1')
-    expect(new URL(urls[0]).searchParams.get('teamId')).toBe('team_1')
-    expect(headers.every((h) => h === 'Bearer tok')).toBe(true)
+    expect(calls.map((c) => c.url.searchParams.get('by')).sort()).toEqual(['country', 'day', 'day', 'osName', 'referrerHostname'])
+    expect(calls[0].url.searchParams.get('projectId')).toBe('prj_1')
+    expect(calls[0].url.searchParams.get('teamId')).toBe('team_1')
+    expect(calls.every((c) => c.auth === 'Bearer tok')).toBe(true)
+  })
+  it('asks for the current window and the equally long window before it', async () => {
+    vi.useFakeTimers()
+    const now = new Date('2026-11-14T12:00:00.000Z')
+    vi.setSystemTime(now)
+    const { calls, fake } = capture()
+    await fetchVercelStats(7, { token: 't', projectId: 'p' }, fake)
+    const day = calls.filter((c) => c.url.searchParams.get('by') === 'day').map((c) => ({
+      since: c.url.searchParams.get('since'), until: c.url.searchParams.get('until'), limit: c.url.searchParams.get('limit'),
+    }))
+    const D = 86_400_000
+    expect(day).toContainEqual({ since: new Date(+now - 7 * D).toISOString(), until: now.toISOString(), limit: '8' })
+    expect(day).toContainEqual({ since: new Date(+now - 14 * D).toISOString(), until: new Date(+now - 7 * D).toISOString(), limit: '8' })
   })
   it('requests enough daily rows to cover the whole range', async () => {
-    const limits: Record<string, number> = {}
-    const fake = (async (url: string) => {
-      const u = new URL(url)
-      limits[u.searchParams.get('by')!] = Number(u.searchParams.get('limit'))
-      return new Response(JSON.stringify({ data: [] }), { status: 200 })
-    }) as unknown as typeof fetch
+    const { calls, fake } = capture()
     await fetchVercelStats(90, { token: 't', projectId: 'p' }, fake)
-    expect(limits.day).toBeGreaterThanOrEqual(90)
+    const limits = calls.filter((c) => c.url.searchParams.get('by') === 'day').map((c) => Number(c.url.searchParams.get('limit')))
+    expect(limits.every((l) => l >= 90)).toBe(true)
   })
   it('throws on a non-2xx response', async () => {
     const fake = (async () => new Response('{}', { status: 403 })) as unknown as typeof fetch
