@@ -22,14 +22,14 @@ const referrers = computed(() => props.data.byReferrer.map((r) => ({ name: r.hos
 </script>
 
 <template>
-  <section class="mx-auto max-w-5xl space-y-4 px-5 py-8">
-    <div class="flex items-center justify-between">
-      <div role="group" :aria-label="t('admin.dashboard.range')" class="flex border border-line text-sm">
+  <section class="mx-auto max-w-5xl space-y-4 px-4 py-6 sm:px-5 sm:py-8">
+    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div role="group" :aria-label="t('admin.dashboard.range')" class="flex w-full border border-line text-sm sm:w-auto">
         <button v-for="r in ranges" :key="r" :aria-pressed="r === range"
-          class="px-3 py-1.5" :class="r === range ? 'bg-accent text-accent-fg' : 'text-muted hover:text-fg'"
+          class="min-h-11 flex-1 px-4 sm:flex-none" :class="r === range ? 'bg-accent text-accent-fg' : 'text-muted hover:text-fg'"
           @click="$emit('update:range', r)">{{ t('admin.dashboard.days', { n: r }) }}</button>
       </div>
-      <p class="hidden text-xs text-muted sm:block">{{ t('admin.dashboard.lowerBound') }}</p>
+      <p class="text-xs text-muted">{{ t('admin.dashboard.lowerBound') }}</p>
     </div>
     <div class="grid gap-4 sm:grid-cols-2">
       <StatCard :label="t('admin.dashboard.visits')" :value="data.totals.visits" :failed="vFail"
@@ -37,12 +37,12 @@ const referrers = computed(() => props.data.byReferrer.map((r) => ({ name: r.hos
       <StatCard :label="t('admin.dashboard.githubDownloads')" :value="data.totals.githubDownloads" :failed="gFail" />
     </div>
     <TimeSeries :series="data.series" :failed="vFail" />
-    <div class="grid gap-4 md:grid-cols-3">
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       <BreakdownTable :title="t('admin.dashboard.byOs')" :rows="data.byOs" :failed="vFail" />
       <BreakdownTable :title="t('admin.dashboard.byCountry')" :rows="countries" :failed="vFail" />
       <BreakdownTable :title="t('admin.dashboard.byReferrer')" :rows="referrers" :failed="vFail" />
     </div>
-    <div class="grid gap-4 md:grid-cols-2">
+    <div class="grid items-start gap-4 md:grid-cols-2">
       <DownloadsTable :rows="data.downloads" :failed="gFail" />
       <SyncCard :sync="data.sync" :failed="syncFail" />
     </div>

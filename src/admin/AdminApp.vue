@@ -28,13 +28,13 @@ async function logout() {
 
 <template>
   <header class="border-b border-line bg-surface">
-    <div class="mx-auto flex h-14 max-w-5xl items-center justify-between px-5">
+    <div class="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-5">
       <span class="font-semibold text-fg">Arctri · {{ t('admin.title') }}</span>
       <div class="flex items-center gap-3 text-sm">
-        <button class="border border-line px-2 py-1 text-muted hover:text-fg" @click="setLocale(locale === 'en' ? 'th' : 'en')">
+        <button class="min-h-11 border border-line px-3 text-muted hover:text-fg" @click="setLocale(locale === 'en' ? 'th' : 'en')">
           {{ locale === 'en' ? 'TH' : 'EN' }}
         </button>
-        <button v-if="!unauthorized" class="border border-line px-2 py-1 text-muted hover:text-fg" @click="logout">{{ t('admin.logout') }}</button>
+        <button v-if="!unauthorized" class="min-h-11 border border-line px-3 text-muted hover:text-fg" @click="logout">{{ t('admin.logout') }}</button>
       </div>
     </div>
   </header>

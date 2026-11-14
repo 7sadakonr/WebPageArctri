@@ -28,15 +28,15 @@ async function submit() {
 </script>
 
 <template>
-  <form class="mx-auto mt-24 max-w-sm space-y-4 border border-line bg-surface p-6" @submit.prevent="submit">
+  <form class="mx-4 mt-8 space-y-4 border border-line bg-surface p-6 sm:mx-auto sm:mt-24 sm:max-w-sm" @submit.prevent="submit">
     <h1 class="text-lg font-medium text-fg">{{ t('admin.login.title') }}</h1>
     <label class="block text-sm text-muted">
       {{ t('admin.login.password') }}
       <input v-model="password" type="password" autocomplete="current-password" required
-        class="mt-1 w-full border border-line bg-bg px-3 py-2 text-fg outline-none focus:border-accent" />
+        class="mt-1 min-h-11 w-full border border-line bg-bg px-3 text-base text-fg outline-none focus:border-accent" />
     </label>
     <p v-if="failed" role="alert" class="text-sm text-red-300">{{ t(failed === 'wrong' ? 'admin.login.wrong' : 'admin.error.generic') }}</p>
-    <button :disabled="busy" class="w-full bg-accent px-4 py-2.5 text-sm font-medium text-accent-fg hover:bg-accent/90 disabled:opacity-60">
+    <button :disabled="busy" class="min-h-11 w-full bg-accent px-4 text-sm font-medium text-accent-fg hover:bg-accent/90 disabled:opacity-60">
       {{ t('admin.login.submit') }}
     </button>
   </form>

@@ -8,7 +8,7 @@ const max = computed(() => Math.max(1, ...props.rows.map((r) => r.visits)))
 </script>
 
 <template>
-  <section class="border border-line bg-surface p-5">
+  <section class="border border-line bg-surface p-4 sm:p-5">
     <h3 class="text-sm font-medium text-fg">{{ title }}</h3>
     <p v-if="failed" class="mt-3 text-sm text-muted">{{ t('admin.dashboard.unavailable') }}</p>
     <p v-else-if="!rows.length" class="mt-3 text-sm text-muted">{{ t('admin.dashboard.noData') }}</p>
