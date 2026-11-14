@@ -12,7 +12,7 @@ const links = ['features', 'agents', 'download', 'faq'] as const
   <header class="fixed inset-x-0 top-0 z-50 border-b border-line bg-bg/80 backdrop-blur-md">
     <div class="mx-auto flex h-14 max-w-6xl items-center justify-between px-5">
       <a href="#" class="flex items-center gap-2 font-semibold text-fg">
-        <img src="/icon.png" alt="" class="h-6 w-6" /> Arctri
+        <img src="/icon-64.png" alt="" class="h-6 w-6" /> Arctri
       </a>
       <nav class="hidden gap-6 text-sm text-muted md:flex">
         <a v-for="l in links" :key="l" :href="`#${l}`" class="transition hover:text-fg">{{ t(`nav.${l}`) }}</a>
