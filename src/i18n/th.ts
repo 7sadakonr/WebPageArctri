@@ -162,5 +162,28 @@ export default {
       ],
     },
   },
+  admin: {
+    title: 'สถิติ',
+    logout: 'ออกจากระบบ',
+    loading: 'กำลังโหลด…',
+    login: { title: 'เข้าสู่ระบบผู้ดูแล', password: 'รหัสผ่าน', submit: 'เข้าสู่ระบบ', wrong: 'รหัสผ่านไม่ถูกต้อง' },
+    error: { generic: 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง' },
+    dashboard: {
+      visits: 'ยอดเข้าชม', githubDownloads: 'ดาวน์โหลดจาก GitHub', range: 'ช่วงเวลา', days: '{n} วัน',
+      visitsOverTime: 'ยอดเข้าชมตามเวลา', byOs: 'ระบบปฏิบัติการ', byCountry: 'ประเทศ', byReferrer: 'แหล่งที่มา',
+      downloads: 'ดาวน์โหลดแยกตามเวอร์ชัน', version: 'เวอร์ชัน', platform: 'แพลตฟอร์ม', count: 'ดาวน์โหลด',
+      noData: 'ยังไม่มีข้อมูล', unavailable: 'โหลดข้อมูลนี้ไม่ได้', direct: '(เข้าตรง)',
+      vsPrevious: 'เทียบ {n} วันก่อนหน้า',
+      sync: {
+        title: 'การ sync เวอร์ชัน', website: 'เว็บไซต์', github: 'GitHub ล่าสุด',
+        status: { 'in-sync': 'ตรงกัน', behind: 'เว็บล้าหลัง', unknown: 'ไม่ทราบ' },
+        note: 'release ที่ไม่มีไฟล์ติดตั้งที่ตรงกันจะถูกข้ามโดยงาน sync และแสดงเป็นล้าหลัง',
+      },
+      tableView: 'ดูเป็นตาราง', seriesSummary: 'กราฟเส้นยอดเข้าชมรายวัน {n} วัน รวม {total} สูงสุด {max}',
+      githubNote: 'นับเฉพาะจาก GitHub ตลอดเวลา ไม่รวมการกดปุ่มดาวน์โหลดบนเว็บ',
+      lowerBound: 'ตัวเลขเป็นค่าขั้นต่ำ (ตัวบล็อกโฆษณาซ่อนบางการเข้าชม)',
+      platforms: { windows: 'Windows x64', 'mac-arm': 'macOS Apple Silicon', 'mac-intel': 'macOS Intel', other: 'อื่นๆ' },
+    },
+  },
   footer: { rights: 'สัญญาอนุญาต MIT พัฒนาโดย เจษฎากร เมืองวิชิต' },
 }

@@ -162,5 +162,28 @@ export default {
       ],
     },
   },
+  admin: {
+    title: 'Analytics',
+    logout: 'Log out',
+    loading: 'Loading…',
+    login: { title: 'Admin login', password: 'Password', submit: 'Log in', wrong: 'Wrong password.' },
+    error: { generic: 'Something went wrong. Please try again.' },
+    dashboard: {
+      visits: 'Visits', githubDownloads: 'GitHub downloads', range: 'Date range', days: '{n} days',
+      visitsOverTime: 'Visits over time', byOs: 'Operating system', byCountry: 'Country', byReferrer: 'Referrer',
+      downloads: 'Downloads by release', version: 'Version', platform: 'Platform', count: 'Downloads',
+      noData: 'No data yet.', unavailable: 'Could not load this data.', direct: '(direct)',
+      vsPrevious: 'vs previous {n} days',
+      sync: {
+        title: 'Release sync', website: 'Website', github: 'GitHub latest',
+        status: { 'in-sync': 'In sync', behind: 'Website is behind', unknown: 'Unknown' },
+        note: 'A release without matching installers is skipped by the sync job and shows as behind.',
+      },
+      tableView: 'Table view', seriesSummary: 'Line chart of daily visits: {n} days, {total} in total, peak {max}.',
+      githubNote: 'GitHub only, all time. Clicks on the website download buttons are not counted.',
+      lowerBound: 'Counts are lower bounds (ad-blockers hide some visits).',
+      platforms: { windows: 'Windows x64', 'mac-arm': 'macOS Apple Silicon', 'mac-intel': 'macOS Intel', other: 'Other' },
+    },
+  },
   footer: { rights: 'MIT licensed. Made by Jetsadakorn Muangwichit.' },
 }

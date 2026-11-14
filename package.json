@@ -7,20 +7,25 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "publish-release": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/publish-release.mjs"
+    "publish-release": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/publish-release.mjs",
+    "test": "vitest run",
+    "typecheck:api": "tsc -p tsconfig.api.json"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "lucide-vue-next": "^1.0.0",
     "vue": "^3.5.44",
     "vue-i18n": "^11.4.14"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^22.20.5",
     "@vercel/blob": "^2.8.1",
     "@vitejs/plugin-vue": "^6.0.10",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",
     "vite": "^8.3.4",
+    "vitest": "^5.1.0",
     "vue-tsc": "^3.3.13"
   }
 }

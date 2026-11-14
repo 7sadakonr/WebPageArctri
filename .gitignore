@@ -5,3 +5,7 @@ dist
 .vercel
 .env
 .env.*
+
+.superpowers
+.env*
+!.env.example
