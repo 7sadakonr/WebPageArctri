@@ -115,11 +115,14 @@ Set these in the Vercel project's environment variables (server-side only, **nev
 | `VERCEL_PROJECT_ID` | This project's ID (Project Settings → General) |
 | `VERCEL_TEAM_ID` | Optional, if the project belongs to a team |
 | `GITHUB_TOKEN` | Optional, raises the GitHub API rate limit |
+| `MANIFEST_URL` | Optional, manifest used by the sync-status card (defaults to the production `latest.json`) |
 
 One-time setup in the Vercel dashboard:
 
 1. Enable **Web Analytics** for the project (data starts accumulating after the next deploy).
 2. Add a Firewall rate-limit rule for `/api/admin/login` (about 5 requests per minute per IP) to slow down password guessing.
+
+The dashboard also compares visits with the previous period of the same length and shows whether the website's published version matches the latest GitHub release.
 
 Notes: visit counts are lower bounds (ad-blockers hide some visits). Clicks on the website download buttons are **not** counted because querying custom events needs a Vercel Pro plan; the downloads table shows GitHub's own all-time counts only. Run `npm test` for the test suite and `npm run typecheck:api` for the serverless functions.
 

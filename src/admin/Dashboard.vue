@@ -5,6 +5,7 @@ import type { Overview, Range } from '../../api/_lib/types'
 import BreakdownTable from './components/BreakdownTable.vue'
 import DownloadsTable from './components/DownloadsTable.vue'
 import StatCard from './components/StatCard.vue'
+import SyncCard from './components/SyncCard.vue'
 import TimeSeries from './components/TimeSeries.vue'
 import { regionName } from './regionName'
 
@@ -15,6 +16,7 @@ const { t, locale } = useI18n()
 const ranges: Range[] = [7, 30, 90]
 const vFail = computed(() => props.data.sources.vercel === 'error')
 const gFail = computed(() => props.data.sources.github === 'error')
+const syncFail = computed(() => props.data.sources.github === 'error' || props.data.sources.manifest === 'error')
 const countries = computed(() => props.data.byCountry.map((r) => ({ name: regionName(r.code, locale.value), visits: r.visits })))
 const referrers = computed(() => props.data.byReferrer.map((r) => ({ name: r.host || t('admin.dashboard.direct'), visits: r.visits })))
 </script>
@@ -30,7 +32,8 @@ const referrers = computed(() => props.data.byReferrer.map((r) => ({ name: r.hos
       <p class="hidden text-xs text-muted sm:block">{{ t('admin.dashboard.lowerBound') }}</p>
     </div>
     <div class="grid gap-4 sm:grid-cols-2">
-      <StatCard :label="t('admin.dashboard.visits')" :value="data.totals.visits" :failed="vFail" />
+      <StatCard :label="t('admin.dashboard.visits')" :value="data.totals.visits" :failed="vFail"
+        :change="data.totals.visitsChangePct" :change-label="t('admin.dashboard.vsPrevious', { n: range })" />
       <StatCard :label="t('admin.dashboard.githubDownloads')" :value="data.totals.githubDownloads" :failed="gFail" />
     </div>
     <TimeSeries :series="data.series" :failed="vFail" />
@@ -39,6 +42,9 @@ const referrers = computed(() => props.data.byReferrer.map((r) => ({ name: r.hos
       <BreakdownTable :title="t('admin.dashboard.byCountry')" :rows="countries" :failed="vFail" />
       <BreakdownTable :title="t('admin.dashboard.byReferrer')" :rows="referrers" :failed="vFail" />
     </div>
-    <DownloadsTable :rows="data.downloads" :failed="gFail" />
+    <div class="grid gap-4 md:grid-cols-2">
+      <DownloadsTable :rows="data.downloads" :failed="gFail" />
+      <SyncCard :sync="data.sync" :failed="syncFail" />
+    </div>
   </section>
 </template>
