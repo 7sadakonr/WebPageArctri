@@ -9,7 +9,7 @@ export async function fetchGithubDownloads(
 ): Promise<GithubRaw> {
   const headers: Record<string, string> = { Accept: 'application/vnd.github+json', 'User-Agent': 'arctri-website-admin' }
   if (token) headers.Authorization = `Bearer ${token}`
-  const res = await fetchImpl(`https://api.github.com/repos/${repo.owner}/${repo.name}/releases?per_page=30`, { headers })
+  const res = await fetchImpl(`https://api.github.com/repos/${repo.owner}/${repo.name}/releases?per_page=30`, { headers, signal: AbortSignal.timeout(8000) })
   if (!res.ok) throw new Error(`GitHub releases ${res.status}`)
   const releases = (await res.json()) as GhRelease[]
   const published = releases.filter((r) => !r.draft)

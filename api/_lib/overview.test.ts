@@ -94,7 +94,7 @@ describe('fetchVercelStats', () => {
     expect(calls[0].url.searchParams.get('teamId')).toBe('team_1')
     expect(calls.every((c) => c.auth === 'Bearer tok')).toBe(true)
   })
-  it('asks for the current window and the equally long window before it', async () => {
+  it('uses UTC-day-aligned windows that cannot overlap', async () => {
     vi.useFakeTimers()
     const now = new Date('2026-11-14T12:00:00.000Z')
     vi.setSystemTime(now)
@@ -103,9 +103,24 @@ describe('fetchVercelStats', () => {
     const day = calls.filter((c) => c.url.searchParams.get('by') === 'day').map((c) => ({
       since: c.url.searchParams.get('since'), until: c.url.searchParams.get('until'), limit: c.url.searchParams.get('limit'),
     }))
-    const D = 86_400_000
-    expect(day).toContainEqual({ since: new Date(+now - 7 * D).toISOString(), until: now.toISOString(), limit: '8' })
-    expect(day).toContainEqual({ since: new Date(+now - 14 * D).toISOString(), until: new Date(+now - 7 * D).toISOString(), limit: '8' })
+    expect(day).toContainEqual({ since: '2026-11-08T00:00:00.000Z', until: now.toISOString(), limit: '8' })
+    expect(day).toContainEqual({ since: '2026-11-01T00:00:00.000Z', until: '2026-11-07T23:59:59.999Z', limit: '8' })
+  })
+  it('keeps the rest of the data when only the previous window is rejected', async () => {
+    vi.useFakeTimers()
+    const now = new Date('2026-11-14T12:00:00.000Z')
+    vi.setSystemTime(now)
+    const fake = (async (url: string) => {
+      const q = new URL(String(url)).searchParams
+      if (q.get('until') !== now.toISOString()) return new Response('{}', { status: 400 })
+      return new Response(JSON.stringify({ data: [{ timestamp: '2026-11-14T00:00:00.000Z', visitors: 3 }] }), { status: 200 })
+    }) as unknown as typeof fetch
+    const raw = await fetchVercelStats(30, { token: 't', projectId: 'p' }, fake)
+    expect(raw.previousSeries).toBeNull()
+    expect(raw.series).toHaveLength(1)
+    const o = buildOverview(30, raw, github, manifest)
+    expect(o.sources.vercel).toBe('ok')
+    expect(o.totals).toMatchObject({ visits: 3, visitsPrevious: 0, visitsChangePct: null })
   })
   it('requests enough daily rows to cover the whole range', async () => {
     const { calls, fake } = capture()
@@ -116,6 +131,21 @@ describe('fetchVercelStats', () => {
   it('throws on a non-2xx response', async () => {
     const fake = (async () => new Response('{}', { status: 403 })) as unknown as typeof fetch
     await expect(fetchVercelStats(7, { token: 't', projectId: 'p' }, fake)).rejects.toThrow(/403/)
+  })
+})
+
+describe('upstream timeouts', () => {
+  it('every fetcher passes an abort signal', async () => {
+    const signals: unknown[] = []
+    const fake = (async (_u: string, init: RequestInit) => {
+      signals.push(init?.signal)
+      return new Response('{"data":[],"version":"1"}', { status: 200 })
+    }) as unknown as typeof fetch
+    await fetchVercelStats(7, { token: 't', projectId: 'p' }, fake)
+    await fetchGithubDownloads({ owner: 'o', name: 'r' }, undefined, (async (_u: string, init: RequestInit) => { signals.push(init?.signal); return new Response('[]', { status: 200 }) }) as unknown as typeof fetch)
+    await fetchManifest('https://m.test/x', fake)
+    expect(signals.length).toBeGreaterThanOrEqual(7)
+    expect(signals.every((s) => s instanceof AbortSignal)).toBe(true)
   })
 })
 

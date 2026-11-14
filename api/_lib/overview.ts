@@ -29,7 +29,7 @@ export function buildOverview(range: Range, vercel: VercelRaw | Error, github: G
       visits,
       githubDownloads: downloads.reduce((s, d) => s + d.githubCount, 0),
       visitsPrevious,
-      visitsChangePct: v && visitsPrevious > 0 ? Math.round(((visits - visitsPrevious) / visitsPrevious) * 100) : null,
+      visitsChangePct: v && v.previousSeries && visitsPrevious > 0 ? Math.round(((visits - visitsPrevious) / visitsPrevious) * 100) : null,
     },
     series,
     byOs: (v?.byOs ?? []).map((r) => ({ name: label(r, 'osName'), visits: count(r) })),

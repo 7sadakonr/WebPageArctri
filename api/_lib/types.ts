@@ -18,7 +18,8 @@ export interface Overview {
 export type VercelRow = Record<string, string | number | undefined>
 export interface VercelRaw {
   series: VercelRow[]
-  previousSeries: VercelRow[]
+  /** null when the previous window could not be fetched (e.g. beyond the plan's reporting window) */
+  previousSeries: VercelRow[] | null
   byOs: VercelRow[]
   byCountry: VercelRow[]
   byReferrer: VercelRow[]
