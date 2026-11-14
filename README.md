@@ -126,6 +126,10 @@ The dashboard also compares visits with the previous period of the same length a
 
 Notes: visit counts are lower bounds (ad-blockers hide some visits). Clicks on the website download buttons are **not** counted because querying custom events needs a Vercel Pro plan; the downloads table shows GitHub's own all-time counts only. Run `npm test` for the test suite and `npm run typecheck:api` for the serverless functions.
 
+## SEO
+
+`index.html` carries the static metadata (title, description, Open Graph, Twitter card, JSON-LD `SoftwareApplication`) with `__SITE_URL__` placeholders. The `vite/seo.ts` plugin fills them at build time and emits `robots.txt` and `sitemap.xml`. The site origin is `SITE_URL`, else Vercel's `VERCEL_PROJECT_PRODUCTION_URL`, else `https://arctri-website.vercel.app`, so moving to a custom domain needs no code change. `/admin` and `/api/*` are kept out of search with `X-Robots-Tag: noindex` (see `vercel.json`) and `robots.txt`. After deploying, check the result with `curl -s <site> | grep -E "canonical|og:|ld\+json"`, Google's Rich Results Test and Search Console.
+
 ## Project Structure
 
 ```text
@@ -137,6 +141,7 @@ WebPageArctri/
 │   ├── i18n/                 # English / Thai translations
 │   ├── config.ts             # Repository and manifest configuration
 │   └── App.vue               # Page composition
+├── vite/                     # Build-time SEO plugin (canonical, robots.txt, sitemap)
 ├── api/                      # Vercel Functions for /admin (login, overview)
 ├── public/                   # Branding assets
 ├── scripts/                  # Release publish/sync utilities

@@ -33,7 +33,7 @@ onBeforeUnmount(() => {
 <template>
   <div>
     <div v-if="m.closed" class="flex h-56 flex-col items-center justify-center gap-4 border border-line bg-surface">
-      <img src="/icon.png" alt="" class="h-10 w-10" />
+      <img src="/icon-64.png" alt="" class="h-10 w-10" />
       <button class="border border-line px-4 py-2 text-sm text-fg transition hover:bg-surface-2" @click="m.reopenWindow()">
         {{ t('mock.reopen') }}
       </button>
