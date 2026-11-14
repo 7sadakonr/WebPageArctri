@@ -4,13 +4,14 @@ export type SourceStatus = 'ok' | 'error'
 
 export interface Overview {
   range: Range
-  sources: { vercel: SourceStatus; github: SourceStatus }
+  sources: { vercel: SourceStatus; github: SourceStatus; manifest: SourceStatus }
   totals: { visits: number; githubDownloads: number; visitsPrevious: number; visitsChangePct: number | null }
   series: { date: string; visits: number }[]
   byOs: { name: string; visits: number }[]
   byCountry: { code: string; visits: number }[]
   byReferrer: { host: string; visits: number }[]
   downloads: { version: string; platform: Platform; githubCount: number }[]
+  sync: { website: string | null; github: string | null; status: 'in-sync' | 'behind' | 'unknown' }
 }
 
 /** A row of Vercel's visits/aggregate `data`: the grouped dimension plus counts. */
@@ -24,4 +25,5 @@ export interface VercelRaw {
 }
 
 export interface GithubAsset { version: string; name: string; downloadCount: number }
-export interface GithubRaw { assets: GithubAsset[] }
+export interface GithubRaw { assets: GithubAsset[]; latestTag: string | null }
+export interface ManifestRaw { version: string | null }

@@ -12,9 +12,10 @@ export async function fetchGithubDownloads(
   const res = await fetchImpl(`https://api.github.com/repos/${repo.owner}/${repo.name}/releases?per_page=30`, { headers })
   if (!res.ok) throw new Error(`GitHub releases ${res.status}`)
   const releases = (await res.json()) as GhRelease[]
+  const published = releases.filter((r) => !r.draft)
   return {
-    assets: releases
-      .filter((r) => !r.draft)
+    latestTag: published[0]?.tag_name.replace(/^v/, '') ?? null,
+    assets: published
       .flatMap((r) => r.assets.map((a) => ({ version: r.tag_name.replace(/^v/, ''), name: a.name, downloadCount: a.download_count }))),
   }
 }

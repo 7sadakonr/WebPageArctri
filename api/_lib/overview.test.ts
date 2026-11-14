@@ -2,7 +2,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { buildOverview } from './overview'
 import { fetchVercelStats } from './vercelAnalytics'
 import { fetchGithubDownloads } from './githubReleases'
-import type { GithubRaw, VercelRaw } from './types'
+import { fetchManifest } from './manifest'
+import type { GithubRaw, ManifestRaw, VercelRaw } from './types'
 
 const vercel: VercelRaw = {
   previousSeries: [{ timestamp: '2026-10-01T00:00:00.000Z', pageviews: 12, visitors: 10 }],
@@ -14,7 +15,9 @@ const vercel: VercelRaw = {
   byCountry: [{ country: 'TH', visitors: 11 }, { country: 'US', visitors: 4 }],
   byReferrer: [{ referrerHostname: 'github.com', visitors: 7 }],
 }
+const manifest: ManifestRaw = { version: '0.3.0' }
 const github: GithubRaw = {
+  latestTag: '0.3.0',
   assets: [
     { version: '0.3.0', name: 'Arctri-Setup-0.3.0-x64.exe', downloadCount: 20 },
     { version: '0.3.0', name: 'Arctri-0.3.0-arm64.dmg', downloadCount: 30 },
@@ -25,8 +28,8 @@ const github: GithubRaw = {
 
 describe('buildOverview', () => {
   it('condenses both sources', () => {
-    const o = buildOverview(30, vercel, github)
-    expect(o.sources).toEqual({ vercel: 'ok', github: 'ok' })
+    const o = buildOverview(30, vercel, github, manifest)
+    expect(o.sources).toEqual({ vercel: 'ok', github: 'ok', manifest: 'ok' })
     expect(o.totals).toEqual({ visits: 15, githubDownloads: 56, visitsPrevious: 10, visitsChangePct: 50 })
     expect(o.series).toEqual([{ date: '2026-11-01', visits: 10 }, { date: '2026-11-02', visits: 5 }])
     expect(o.byOs).toEqual([{ name: 'macOS', visits: 9 }, { name: 'Windows', visits: 6 }])
@@ -41,34 +44,34 @@ describe('buildOverview', () => {
   })
   it('returns zeros and empty lists for a site with no traffic', () => {
     const empty: VercelRaw = { previousSeries: [], series: [], byOs: [], byCountry: [], byReferrer: [] }
-    const o = buildOverview(7, empty, { assets: [] })
-    expect(o.sources).toEqual({ vercel: 'ok', github: 'ok' })
+    const o = buildOverview(7, empty, { assets: [], latestTag: null }, manifest)
+    expect(o.sources).toEqual({ vercel: 'ok', github: 'ok', manifest: 'ok' })
     expect(o.totals).toEqual({ visits: 0, githubDownloads: 0, visitsPrevious: 0, visitsChangePct: null })
     expect([o.series, o.byOs, o.byCountry, o.byReferrer, o.downloads]).toEqual([[], [], [], [], []])
   })
   it('keeps GitHub data when Vercel fails', () => {
-    const o = buildOverview(30, new Error('boom'), github)
-    expect(o.sources).toEqual({ vercel: 'error', github: 'ok' })
+    const o = buildOverview(30, new Error('boom'), github, manifest)
+    expect(o.sources).toEqual({ vercel: 'error', github: 'ok', manifest: 'ok' })
     expect(o.totals).toMatchObject({ visits: 0, visitsPrevious: 0, visitsChangePct: null })
     expect(o.series).toEqual([])
     expect(o.totals.githubDownloads).toBe(56)
   })
   it('keeps Vercel data when GitHub fails', () => {
-    const o = buildOverview(30, vercel, new Error('boom'))
-    expect(o.sources).toEqual({ vercel: 'ok', github: 'error' })
+    const o = buildOverview(30, vercel, new Error('boom'), manifest)
+    expect(o.sources).toEqual({ vercel: 'ok', github: 'error', manifest: 'ok' })
     expect(o.totals).toMatchObject({ visits: 15, githubDownloads: 0 })
     expect(o.downloads).toEqual([])
   })
   it('reports a decrease, no change, and no percentage when the previous period is empty', () => {
     const prev = (n: number): VercelRaw => ({ ...vercel, previousSeries: [{ timestamp: '2026-10-01T00:00:00.000Z', visitors: n }] })
-    expect(buildOverview(30, prev(20), github).totals.visitsChangePct).toBe(-25)
-    expect(buildOverview(30, prev(15), github).totals.visitsChangePct).toBe(0)
-    const none = buildOverview(30, prev(0), github).totals
+    expect(buildOverview(30, prev(20), github, manifest).totals.visitsChangePct).toBe(-25)
+    expect(buildOverview(30, prev(15), github, manifest).totals.visitsChangePct).toBe(0)
+    const none = buildOverview(30, prev(0), github, manifest).totals
     expect(none.visitsPrevious).toBe(0)
     expect(none.visitsChangePct).toBeNull()
   })
   it('falls back to pageviews and skips rows without a count', () => {
-    const o = buildOverview(7, { ...vercel, byOs: [{ osName: 'Linux', pageviews: 3 }, { osName: 'X' }] }, github)
+    const o = buildOverview(7, { ...vercel, byOs: [{ osName: 'Linux', pageviews: 3 }, { osName: 'X' }] }, github, manifest)
     expect(o.byOs).toEqual([{ name: 'Linux', visits: 3 }, { name: 'X', visits: 0 }])
   })
 })
@@ -124,11 +127,55 @@ describe('fetchGithubDownloads', () => {
     ]
     const fake = (async () => new Response(JSON.stringify(body), { status: 200 })) as unknown as typeof fetch
     expect(await fetchGithubDownloads({ owner: 'o', name: 'r' }, undefined, fake)).toEqual({
+      latestTag: '0.3.0',
       assets: [{ version: '0.3.0', name: 'a.exe', downloadCount: 4 }],
     })
+  })
+  it('latestTag is null when there are no published releases', async () => {
+    const only = (async () => new Response(JSON.stringify([{ tag_name: 'v9.0.0', draft: true, assets: [] }]), { status: 200 })) as unknown as typeof fetch
+    expect((await fetchGithubDownloads({ owner: 'o', name: 'r' }, undefined, only)).latestTag).toBeNull()
+    const none = (async () => new Response('[]', { status: 200 })) as unknown as typeof fetch
+    expect((await fetchGithubDownloads({ owner: 'o', name: 'r' }, undefined, none)).latestTag).toBeNull()
   })
   it('throws on a non-2xx response', async () => {
     const fake = (async () => new Response('{}', { status: 500 })) as unknown as typeof fetch
     await expect(fetchGithubDownloads({ owner: 'o', name: 'r' }, 'tok', fake)).rejects.toThrow(/500/)
+  })
+})
+
+describe('sync status', () => {
+  const sync = (g: GithubRaw | Error, m: ManifestRaw | Error) => buildOverview(30, vercel, g, m)
+  it('is in-sync when versions match, ignoring a leading v', () => {
+    expect(sync(github, { version: '0.3.0' }).sync).toEqual({ website: '0.3.0', github: '0.3.0', status: 'in-sync' })
+    expect(sync({ ...github, latestTag: 'v1.2.0' }, { version: '1.2.0' }).sync.status).toBe('in-sync')
+    expect(sync(github, { version: 'v0.3.0' }).sync.status).toBe('in-sync')
+  })
+  it('is behind when the versions differ', () => {
+    expect(sync(github, { version: '0.2.0' }).sync).toEqual({ website: '0.2.0', github: '0.3.0', status: 'behind' })
+  })
+  it('is unknown when GitHub has no published release', () => {
+    expect(sync({ assets: [], latestTag: null }, manifest).sync).toEqual({ website: '0.3.0', github: null, status: 'unknown' })
+  })
+  it('is unknown when the manifest has no version', () => {
+    expect(sync(github, { version: null }).sync.status).toBe('unknown')
+  })
+  it('is unknown and flags the source when a source fails', () => {
+    const m = sync(github, new Error('404'))
+    expect(m.sync).toEqual({ website: null, github: '0.3.0', status: 'unknown' })
+    expect(m.sources.manifest).toBe('error')
+    expect(sync(new Error('x'), manifest).sync.status).toBe('unknown')
+  })
+})
+
+describe('fetchManifest', () => {
+  const ok = (body: unknown) => (async () => new Response(JSON.stringify(body), { status: 200 })) as unknown as typeof fetch
+  it('reads a string version', async () => expect(await fetchManifest('https://m.test/latest.json', ok({ version: '0.3.0' }))).toEqual({ version: '0.3.0' }))
+  it('returns null for a missing or non-string version', async () => {
+    expect(await fetchManifest('https://m.test/x', ok({}))).toEqual({ version: null })
+    expect(await fetchManifest('https://m.test/x', ok({ version: 3 }))).toEqual({ version: null })
+  })
+  it('throws on a non-2xx response', async () => {
+    const fake = (async () => new Response('', { status: 404 })) as unknown as typeof fetch
+    await expect(fetchManifest('https://m.test/x', fake)).rejects.toThrow(/404/)
   })
 })

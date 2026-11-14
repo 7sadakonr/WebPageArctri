@@ -1,5 +1,6 @@
 import { fetchGithubDownloads } from '../_lib/githubReleases.js'
 import { json, misconfigured } from '../_lib/http.js'
+import { DEFAULT_MANIFEST_URL, fetchManifest } from '../_lib/manifest.js'
 import { buildOverview } from '../_lib/overview.js'
 import { isAuthenticated } from '../_lib/session.js'
 import type { Range } from '../_lib/types.js'
@@ -24,8 +25,11 @@ export async function GET(request: Request): Promise<Response> {
     : Promise.resolve(new Error('Vercel analytics env not configured'))
   const github = fetchGithubDownloads(REPO, process.env.GITHUB_TOKEN).catch(asError)
 
-  const [v, g] = await Promise.all([vercel, github])
+  const manifest = fetchManifest(process.env.MANIFEST_URL || DEFAULT_MANIFEST_URL).catch(asError)
+
+  const [v, g, m] = await Promise.all([vercel, github, manifest])
   if (v instanceof Error) console.error('[admin] vercel source failed:', v.message)
   if (g instanceof Error) console.error('[admin] github source failed:', g.message)
-  return json(buildOverview(range as Range, v, g), 200, { 'Cache-Control': 'private, max-age=300' })
+  if (m instanceof Error) console.error('[admin] manifest source failed:', m.message)
+  return json(buildOverview(range as Range, v, g, m), 200, { 'Cache-Control': 'private, max-age=300' })
 }

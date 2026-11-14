@@ -13,8 +13,9 @@ async function sessionCookie(): Promise<string> {
 const get = (query: string, cookie?: string) =>
   new Request(`https://x.test/api/admin/overview${query}`, { headers: cookie ? { cookie } : {} })
 
-function mockUpstreams(opts: { vercel?: number; github?: number } = {}) {
+function mockUpstreams(opts: { vercel?: number; github?: number; manifest?: number } = {}) {
   vi.stubGlobal('fetch', vi.fn(async (url: string) => {
+    if (String(url).includes('blob.vercel-storage.com')) return new Response(JSON.stringify({ version: '1.0.0' }), { status: opts.manifest ?? 200 })
     if (String(url).includes('api.vercel.com')) {
       return new Response(JSON.stringify({ data: [{ timestamp: '2026-11-01T00:00:00.000Z', visitors: 4 }] }), { status: opts.vercel ?? 200 })
     }
@@ -62,20 +63,30 @@ describe('overview', () => {
     expect(res.status).toBe(200)
     expect(res.headers.get('cache-control')).toBe('private, max-age=300')
     const body = await res.json()
-    expect(body.sources).toEqual({ vercel: 'ok', github: 'ok' })
+    expect(body.sources).toEqual({ vercel: 'ok', github: 'ok', manifest: 'ok' })
+    expect(body.sync).toEqual({ website: '1.0.0', github: '1.0.0', status: 'in-sync' })
     expect(body.totals).toEqual({ visits: 4, githubDownloads: 2, visitsPrevious: 4, visitsChangePct: 0 })
   })
   it('200 with sources.vercel=error when Vercel fails', async () => {
     mockUpstreams({ vercel: 500 })
     const res = await overview(get('?range=7', await sessionCookie()))
     expect(res.status).toBe(200)
-    expect((await res.json()).sources).toEqual({ vercel: 'error', github: 'ok' })
+    expect((await res.json()).sources).toEqual({ vercel: 'error', github: 'ok', manifest: 'ok' })
   })
   it('treats a rejected Vercel token as a source error, not a failure', async () => {
     mockUpstreams({ vercel: 401 })
     const res = await overview(get('?range=7', await sessionCookie()))
     expect(res.status).toBe(200)
     expect((await res.json()).sources.vercel).toBe('error')
+  })
+  it('keeps HTTP 200 and the other cards when the manifest is down', async () => {
+    mockUpstreams({ manifest: 404 })
+    const res = await overview(get('?range=7', await sessionCookie()))
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.sources).toEqual({ vercel: 'ok', github: 'ok', manifest: 'error' })
+    expect(body.sync.status).toBe('unknown')
+    expect(body.totals.visits).toBe(4)
   })
   it('500 when the session secret is missing', async () => {
     vi.stubEnv('ADMIN_SESSION_SECRET', '')
