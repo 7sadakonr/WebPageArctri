@@ -9,7 +9,7 @@ web traffic and download analytics for the site owner / a small team.
 
 **In scope**
 - Overview dashboard: visits, OS split, countries, referrers, time series,
-  per-version GitHub download counts. Range selector 7 / 30 / 90 days.
+  per-version GitHub download counts. Range selector 7 / 30 days (90 was dropped 2026-11-14: the Hobby plan only allows queries up to 62 days, so 90 always failed; re-add on Pro).
 - Single shared-password login, signed-cookie session.
 - Collecting page-view data on the public site (Vercel Web Analytics).
 

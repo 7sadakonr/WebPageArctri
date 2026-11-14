@@ -1,4 +1,4 @@
-export type Range = 7 | 30 | 90
+export type Range = 7 | 30
 export type Platform = 'windows' | 'mac-arm' | 'mac-intel' | 'other'
 export type SourceStatus = 'ok' | 'error'
 

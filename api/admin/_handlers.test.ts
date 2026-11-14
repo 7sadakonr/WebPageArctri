@@ -55,6 +55,7 @@ describe('overview', () => {
   it('400 for an invalid range', async () => {
     mockUpstreams()
     expect((await overview(get('?range=14', await sessionCookie()))).status).toBe(400)
+    expect((await overview(get('?range=90', await sessionCookie()))).status).toBe(400) // beyond what the Hobby plan can query
     expect((await overview(get('', await sessionCookie()))).status).toBe(400)
   })
   it('200 with both sources, private cache header', async () => {

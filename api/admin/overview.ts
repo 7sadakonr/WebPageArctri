@@ -7,7 +7,7 @@ import type { Range } from '../_lib/types.js'
 import { fetchVercelStats } from '../_lib/vercelAnalytics.js'
 
 const REPO = { owner: '7sadakonr', name: 'Arctri' }
-const RANGES = new Set<number>([7, 30, 90])
+const RANGES = new Set<number>([7, 30])
 const asError = (e: unknown): Error => (e instanceof Error ? e : new Error(String(e)))
 
 export async function GET(request: Request): Promise<Response> {

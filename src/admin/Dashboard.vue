@@ -13,7 +13,7 @@ const props = defineProps<{ data: Overview; range: Range }>()
 defineEmits<{ 'update:range': [Range] }>()
 const { t, locale } = useI18n()
 
-const ranges: Range[] = [7, 30, 90]
+const ranges: Range[] = [7, 30]
 const vFail = computed(() => props.data.sources.vercel === 'error')
 const gFail = computed(() => props.data.sources.github === 'error')
 const syncFail = computed(() => props.data.sources.github === 'error' || props.data.sources.manifest === 'error')

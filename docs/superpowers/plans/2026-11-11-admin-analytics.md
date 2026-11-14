@@ -14,7 +14,7 @@
 
 - No vue-router, no chart library, no database, no user accounts (spec §1).
 - Cookie: `HttpOnly; Secure; SameSite=Strict; Path=/`, HMAC-SHA256 over `exp`, lifetime 12 h (spec §3.2).
-- `range` accepts only `7`, `30`, `90`; anything else returns 400 (spec §3.4).
+- `range` accepts only `7`, `30`; anything else returns 400 (spec §3.4).
 - Overview response shape and `Cache-Control: private, max-age=300` exactly as spec §3.3.
 - Tokens (`VERCEL_ACCESS_TOKEN`, `GITHUB_TOKEN`, `ADMIN_*`) are server env only, never `VITE_`-prefixed.
 - Each upstream fails independently: still 200 with `sources.<name> = "error"` (spec §3.4).

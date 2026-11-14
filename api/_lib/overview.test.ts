@@ -122,11 +122,11 @@ describe('fetchVercelStats', () => {
     expect(o.sources.vercel).toBe('ok')
     expect(o.totals).toMatchObject({ visits: 3, visitsPrevious: 0, visitsChangePct: null })
   })
-  it('requests enough daily rows to cover the whole range', async () => {
+  it('requests enough daily rows to cover the longest range', async () => {
     const { calls, fake } = capture()
-    await fetchVercelStats(90, { token: 't', projectId: 'p' }, fake)
+    await fetchVercelStats(30, { token: 't', projectId: 'p' }, fake)
     const limits = calls.filter((c) => c.url.searchParams.get('by') === 'day').map((c) => Number(c.url.searchParams.get('limit')))
-    expect(limits.every((l) => l >= 90)).toBe(true)
+    expect(limits.every((l) => l >= 30)).toBe(true)
   })
   it('throws on a non-2xx response', async () => {
     const fake = (async () => new Response('{}', { status: 403 })) as unknown as typeof fetch
